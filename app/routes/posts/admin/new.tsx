@@ -9,6 +9,7 @@ type ActionData =
       title: null | string;
       slug: null | string;
       markdown: null | string;
+      file: null | string;
     }
   | undefined;
 
@@ -18,11 +19,13 @@ export const action: ActionFunction = async ({ request }) => {
   const title = formData.get("title");
   const slug = formData.get("slug");
   const markdown = formData.get("markdown");
+  const file = formData.get("file");
 
   const errors: ActionData = {
     title: title ? null : "Title is required",
     slug: slug ? null : "Slug is required",
     markdown: markdown ? null : "Markdown is required",
+    file: file ? null : "file is required",
   };
   const hasErrors = Object.values(errors).some(
     (errorMessage) => errorMessage
@@ -44,7 +47,12 @@ export const action: ActionFunction = async ({ request }) => {
     "markdown must be a string"
   );
 
-  await createPost({ title, slug, markdown });
+  invariant(
+    typeof file === "string",
+    "file must be a string"
+  );
+
+  await createPost({ title, slug, markdown, file });
 
   return redirect("/posts/admin");
 };
@@ -55,7 +63,7 @@ export default function NewPost() {
   const errors = useActionData();
 
   return (
-    <Form method="post">
+    <Form method="post" encType="multipart/form-data">
       <p>
         <label>
           Post Title:{" "}
@@ -80,6 +88,16 @@ export default function NewPost() {
             name="slug"
             className={inputClassName}
           />
+        </label>
+      </p>
+      <p>
+        <label>
+          File
+          {errors?.file ? (
+            <em className="text-red-600">{errors.file}</em>
+          ) : null}
+        {/* <input id="file" type="file" name="file" multiple/> */}
+        <input id="file" type="text" name="file" className={inputClassName}/>
         </label>
       </p>
       <p>
