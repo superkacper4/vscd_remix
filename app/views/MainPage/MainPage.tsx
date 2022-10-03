@@ -1,6 +1,7 @@
 import { LinksFunction } from "@remix-run/node";
 
 import { Link } from "@remix-run/react";
+import Nav from "~/components/Nav";
 import { useOptionalUser } from "~/utils";
 import styles from "./MainPage.css";
 // import styles from "~/styles/globals.css";
@@ -15,6 +16,8 @@ const MainPage = () => {
     const user = useOptionalUser();
 
     return(
+        <main className="relative min-h-screen bg-white sm:flex sm:items-center sm:justify-center">
+        <Nav mainPage={true}/>
         <section className="w-full min-h-screen text-white main-bg flex items-center justify-center flex-col">
               <h2 className="text-3x px-3 text-center">
               {user ? 
@@ -57,6 +60,7 @@ const MainPage = () => {
                 }
             </div>
         </section>
+        </main>
     )
 }
 

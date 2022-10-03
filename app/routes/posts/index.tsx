@@ -1,12 +1,14 @@
-import { json, LoaderArgs } from "@remix-run/node";
+import { json, LinksFunction, LoaderArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
+import Nav, { navLinks } from "~/components/Nav";
 import { getPosts } from "~/models/post.server";
 import { requireUserId } from "~/session.server";
+import PostsPage, { postsPageLinks } from "~/views/Posts";
 
-  type LoaderData = {
-    // this is a handy way to say: "posts is whatever type getPosts resolves to"
-    posts: Awaited<ReturnType<typeof getPosts>>;
-  };
+type LoaderData = {
+  // this is a handy way to say: "posts is whatever type getPosts resolves to"
+  posts: Awaited<ReturnType<typeof getPosts>>;
+};
 
 export const loader = async ({ request }: LoaderArgs) => {
   const userId = await requireUserId(request);
@@ -15,27 +17,15 @@ export const loader = async ({ request }: LoaderArgs) => {
   });
 };
 
+export const links: LinksFunction = () => {
+  return [...postsPageLinks(), ...navLinks()];
+}
+
 export default function Posts() {
-    const { posts } = useLoaderData() as LoaderData;
-    console.log(posts);
+  const { posts } = useLoaderData() as LoaderData;
     return (
-      <main>
-      <h1>Posts</h1>
-      <Link to="admin" className="text-red-600 underline">
-        Admin
-      </Link>
-      <ul>
-        {posts.map((post) => (
-          <li key={post.slug}>
-            <Link
-              to={post.slug}
-              className="text-blue-600 underline"
-            >
-              {post.title}
-            </Link>
-          </li>
-        ))}
-      </ul>
-      </main>
+      <>
+        <PostsPage posts={posts}/>
+      </>
     );
   }

@@ -8,11 +8,18 @@ export const navLinks: LinksFunction = () => {
 }
 
 
-const Nav = () => {
+const Nav = ({ mainPage }:{mainPage?: boolean}) => {
     const user = useOptionalUser();
 
     return (
-        <nav className="fixed nav">
+        <nav className="fixed nav"
+        style={{
+          position: mainPage ? "fixed" : "relative",
+        }}
+        >
+          {!mainPage ? 
+            <button onClick={() => history.back()}>Go Back</button>
+          :null}
             <p>Version System Control of Documentation</p>
             <div >
                 {user ? (
