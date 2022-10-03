@@ -16,7 +16,7 @@ const PostsPage = ({posts}: LoaderData) => {
     console.log(posts);
     return (
       <main className="posts-bg">
-      <Nav/>
+      <Nav title="Posts"/>
       <h1>Posts</h1>
       <Link to="admin" className="text-red-600 underline">
         Admin
