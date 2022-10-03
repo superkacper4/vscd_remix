@@ -1,15 +1,17 @@
-import { json } from "@remix-run/node";
+import { json, LoaderArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { getPosts } from "~/models/post.server";
+import { requireUserId } from "~/session.server";
 
   type LoaderData = {
     // this is a handy way to say: "posts is whatever type getPosts resolves to"
     posts: Awaited<ReturnType<typeof getPosts>>;
   };
 
-export const loader = async () => {
+export const loader = async ({ request }: LoaderArgs) => {
+  const userId = await requireUserId(request);
     return json<LoaderData>({
-    posts: await getPosts(),
+    posts: await getPosts({userId}),
   });
 };
 

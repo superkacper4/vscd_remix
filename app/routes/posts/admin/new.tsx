@@ -3,6 +3,7 @@ import { json, redirect } from "@remix-run/node";
 import { Form, useActionData } from "@remix-run/react";
 import invariant from "tiny-invariant";
 import { createPost } from "~/models/post.server";
+import { requireUserId } from "~/session.server";
 
 type ActionData =
   | {
@@ -14,6 +15,8 @@ type ActionData =
   | undefined;
 
 export const action: ActionFunction = async ({ request }) => {
+  const userId = await requireUserId(request);
+
   const formData = await request.formData();
 
   const title = formData.get("title");
@@ -52,7 +55,8 @@ export const action: ActionFunction = async ({ request }) => {
     "file must be a string"
   );
 
-  await createPost({ title, slug, markdown, file });
+
+  await createPost({ title, slug, markdown, file, userId});
 
   return redirect("/posts/admin");
 };

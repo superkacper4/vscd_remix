@@ -1,4 +1,4 @@
-import type { LoaderFunction } from "@remix-run/node";
+import type { LoaderArgs, LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import {
     Link,
@@ -7,13 +7,15 @@ import {
   } from "@remix-run/react";
 
 import { getPosts } from "~/models/post.server";
+import { requireUserId } from "~/session.server";
 
 type LoaderData = {
   posts: Awaited<ReturnType<typeof getPosts>>;
 };
 
-export const loader: LoaderFunction = async () => {
-  return json({ posts: await getPosts() });
+export const loader: LoaderFunction = async ({ request }: LoaderArgs) => {
+  const userId = await requireUserId(request);
+  return json({ posts: await getPosts({userId}) });
 };
 
 export default function PostAdmin() {
