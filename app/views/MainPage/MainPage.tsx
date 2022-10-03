@@ -16,7 +16,7 @@ const MainPage = () => {
 
     return(
         <section className="w-full min-h-screen text-white main-bg flex items-center justify-center flex-col">
-              <h2 className="text-3xl">
+              <h2 className="text-3x px-3 text-center">
               {user ? 
               `Witaj ${user.email}`
               : 
@@ -34,7 +34,7 @@ const MainPage = () => {
                 </Link>
                   <Link
                   to="/notes"
-                  className="flex items-center justify-center rounded-md border border-transparent bg-white px-4 py-3 text-base font-medium text-yellow-700 shadow-sm hover:bg-yellow-50 sm:px-8"
+                  className="flex items-center justify-center rounded-md bg-yellow-500 px-4 py-3 font-medium text-white hover:bg-yellow-600"
                 >
                   View Notes for {user.email}
                 </Link>
