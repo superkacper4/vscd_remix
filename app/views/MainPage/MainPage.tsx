@@ -2,8 +2,8 @@ import { LinksFunction } from "@remix-run/node";
 
 import { Link } from "@remix-run/react";
 import { useOptionalUser } from "~/utils";
-// import styles from "./MainPage.css";
-import styles from "~/styles/globals.css";
+import styles from "./MainPage.css";
+// import styles from "~/styles/globals.css";
 
 // styles is now something like /build/global-AE33KB2.css
 

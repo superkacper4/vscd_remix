@@ -1,15 +1,22 @@
+import { LinksFunction } from "@remix-run/node";
 import { Form, Link } from "@remix-run/react"
 import { useOptionalUser } from "~/utils";
+import styles from './Nav.css'
+
+export const navLinks: LinksFunction = () => {
+  return [{ rel: "stylesheet", href: styles }];
+}
+
 
 const Nav = () => {
     const user = useOptionalUser();
 
     return (
-        <nav className="fixed z-index-5">
+        <nav className="fixed nav">
             <p>Version System Control of Documentation</p>
-            <div className="mx-auto mt-10 max-w-sm sm:flex sm:max-w-none sm:justify-center">
+            <div >
                 {user ? (
-                  <div className="space-y-4 sm:mx-auto sm:inline-grid sm:grid-cols-2 sm:gap-5 sm:space-y-0">
+                  <div>
                   <Form action="/logout" method="post">
                         <button
                         type="submit"

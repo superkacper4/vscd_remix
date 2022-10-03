@@ -1,10 +1,10 @@
 import { LinksFunction } from "@remix-run/node";
-import Nav from "~/components/Nav";
+import Nav, { navLinks } from "~/components/Nav";
 import MainPage, { mainPageLinks } from "~/views/MainPage";
 
 
 export const links: LinksFunction = () => {
-return [...mainPageLinks()];
+return [...mainPageLinks(), ...navLinks()];
 }
 
 export default function Index() {
