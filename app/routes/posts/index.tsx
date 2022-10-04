@@ -1,6 +1,7 @@
 import { json, LinksFunction, LoaderArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import Nav, { navLinks } from "~/components/Nav";
+import { postTileLinks } from "~/components/PostTile";
 import { getPosts } from "~/models/post.server";
 import { requireUserId } from "~/session.server";
 import PostsPage, { postsPageLinks } from "~/views/Posts";
@@ -18,7 +19,7 @@ export const loader = async ({ request }: LoaderArgs) => {
 };
 
 export const links: LinksFunction = () => {
-  return [...postsPageLinks(), ...navLinks()];
+  return [...postsPageLinks(), ...navLinks(), ...postTileLinks()];
 }
 
 export default function Posts() {

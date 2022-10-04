@@ -1,6 +1,7 @@
 import { Link } from "@remix-run/react";
 import { LinksFunction } from "@remix-run/server-runtime";
 import Nav from "~/components/Nav"
+import PostTile from "~/components/PostTile";
 import { getPosts } from "~/models/post.server";
 import styles from './PostsPage.css'
 
@@ -13,26 +14,27 @@ export const postsPageLinks: LinksFunction = () => {
 }
 
 const PostsPage = ({posts}: LoaderData) => {
-    console.log(posts);
     return (
       <main className="posts-bg">
       <Nav title="Posts"/>
-      <h1>Posts</h1>
-      <Link to="admin" className="text-red-600 underline">
-        Admin
-      </Link>
-      <ul>
-        {posts.map((post) => (
-          <li key={post.slug}>
-            <Link
-              to={post.slug}
-              className="text-blue-600 underline"
-            >
-              {post.title}
-            </Link>
-          </li>
-        ))}
-      </ul>
+      <div className="posts-bg-content">
+        <div className="posts-bg-add-button">
+          <Link to="admin">
+            + New
+          </Link>
+        </div>
+        <h1 className="h1">Posts</h1>
+        <div className="posts-bg-wrapper">
+          {posts.map((post) => (
+            <PostTile
+              key={post.slug}
+              title={post.title}
+              slug={post.slug}
+              linkTo={post.slug}
+            />
+          ))}
+        </div>
+      </div>
       </main>
     );
 }
