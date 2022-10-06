@@ -17,6 +17,7 @@ model User {
   password Password?
   notes    Note[]
   post    Post[]
+  commit    Commit[]
 }
 
 model Password {
@@ -46,6 +47,22 @@ model Post {
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  commits Commit[]
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId String
+}
+
+model Commit {
+  id       String @id @default(cuid())
+  message  String
+  file     String
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  post     Post  @relation(fields: [postSlug], references: [slug], onDelete: Cascade, onUpdate: Cascade)
+  postSlug String
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId String
