@@ -7,6 +7,7 @@ import { createFiles } from "~/models/file.server";
 import { createFilesOnCommits } from "~/models/filesOnCommits.server";
 import { getPost } from "~/models/post.server";
 import { requireUserId } from "~/session.server";
+import { v4 as uuidv4 } from "uuid";
 
 type ActionData =
   | {
@@ -39,10 +40,13 @@ export const action: ActionFunction = async ({ request, params }) => {
   invariant(typeof message === "string", "title must be a string");
   invariant(typeof file === "string", "file must be a string");
 
-  const files = await createFiles([{ path: "xd" }, { path: "dupa" }]);
-  const commit = await createCommit({ postSlug, message, userId });
-  console.log(files);
-  // await createFilesOnCommits({  commit: commit.id, files});
+  const fileIdTmp = uuidv4();
+  const filesTmp = [{ path: "xd", id: fileIdTmp }];
+  const filesId = [{ id: fileIdTmp }];
+
+  await createFiles(filesTmp); // create files in tmp s3 folder
+  const commit = await createCommit({ postSlug, message, userId }); // create commit and s3 folder
+  await createFilesOnCommits({ commitId: commit.id, filesId }); // connect commits and files to each other
 
   return redirect("/posts");
 };
