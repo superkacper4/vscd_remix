@@ -4,25 +4,27 @@ import { prisma } from "~/db.server";
 export type { Post } from "@prisma/client";
 
 export async function getPosts({ userId }: { userId: User["id"] }) {
-  return prisma.post.findMany(
-    {
-      where: { userId },
-      select: { slug: true, title: true },
-      orderBy: { updatedAt: "desc" },
-    }
-  );
+  return prisma.post.findMany({
+    where: { userId },
+    select: { slug: true, title: true },
+    orderBy: { updatedAt: "desc" },
+  });
 }
-
-
 
 export async function getPost(slug: string) {
-    return prisma.post.findUnique({ where: { slug } });
+  return prisma.post.findUnique({ where: { slug } });
 }
 
-export async function createPost(  {slug, title, markdown, file, userId}: Pick<Post, "slug" | "title" | "markdown" | "file"> & {
+export async function createPost({
+  slug,
+  title,
+  markdown,
+  file,
+  userId,
+}: Pick<Post, "slug" | "title" | "markdown" | "file"> & {
   userId: User["id"];
 }) {
-    return prisma.post.create({
+  return prisma.post.create({
     data: {
       title,
       slug,
@@ -33,6 +35,6 @@ export async function createPost(  {slug, title, markdown, file, userId}: Pick<P
           id: userId,
         },
       },
-    }
-  })
+    },
+  });
 }

@@ -1,5 +1,5 @@
 datasource db {
-  provider = "sqlite"
+  provider = "postgres"
   url      = env("DATABASE_URL")
 }
 
@@ -39,6 +39,40 @@ model Note {
   userId String
 }
 
+model File {
+  id   String @id @default(cuid())
+  path String
+
+  // commit   Commit  @relation(fields: [commitId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  commits FilesOnCommits[]
+  // commitId String 
+}
+
+model Commit {
+  id       String @id @default(cuid())
+  message  String
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  post     Post  @relation(fields: [postSlug], references: [slug], onDelete: Cascade, onUpdate: Cascade)
+  postSlug String
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId String
+
+  files FilesOnCommits[]
+}
+
+model FilesOnCommits {
+  commit       Commit   @relation(fields: [commitId], references: [id])
+  commitId     String 
+  file         File     @relation(fields: [fileId], references: [id])
+  fileId       String 
+
+  @@id([commitId, fileId])
+}
+
 model Post {
   slug     String @id
   title    String
@@ -49,21 +83,6 @@ model Post {
   updatedAt DateTime @updatedAt
 
   commits Commit[]
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId String
-}
-
-model Commit {
-  id       String @id @default(cuid())
-  message  String
-  file     String
-  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  post     Post  @relation(fields: [postSlug], references: [slug], onDelete: Cascade, onUpdate: Cascade)
-  postSlug String
-
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId String
 }

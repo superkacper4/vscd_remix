@@ -3,6 +3,8 @@ import { json, redirect } from "@remix-run/node";
 import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
 import { createCommit, Post } from "~/models/commit.server";
+import { createFiles } from "~/models/file.server";
+import { createFilesOnCommits } from "~/models/filesOnCommits.server";
 import { getPost } from "~/models/post.server";
 import { requireUserId } from "~/session.server";
 
@@ -13,13 +15,12 @@ type ActionData =
     }
   | undefined;
 
-
 export const action: ActionFunction = async ({ request, params }) => {
   const userId = await requireUserId(request);
 
   invariant(params.slug, `params.slug is required`);
 
-  const postSlug = params.slug
+  const postSlug = params.slug;
 
   const formData = await request.formData();
 
@@ -30,23 +31,18 @@ export const action: ActionFunction = async ({ request, params }) => {
     message: message ? null : "Message is required",
     file: file ? null : "file is required",
   };
-  const hasErrors = Object.values(errors).some(
-    (errorMessage) => errorMessage
-  );
+  const hasErrors = Object.values(errors).some((errorMessage) => errorMessage);
   if (hasErrors) {
     return json<ActionData>(errors);
   }
 
-  invariant(
-    typeof message === "string",
-    "title must be a string"
-  );
-  invariant(
-    typeof file === "string",
-    "file must be a string"
-  );
+  invariant(typeof message === "string", "title must be a string");
+  invariant(typeof file === "string", "file must be a string");
 
-  await createCommit({ postSlug, message ,file, userId});
+  const files = await createFiles([{ path: "xd" }, { path: "dupa" }]);
+  const commit = await createCommit({ postSlug, message, userId });
+  console.log(files);
+  // await createFilesOnCommits({  commit: commit.id, files});
 
   return redirect("/posts");
 };
@@ -64,11 +60,7 @@ export default function NewPost() {
           {errors?.message ? (
             <em className="text-red-600">{errors.message}</em>
           ) : null}
-          <input
-            type="text"
-            name="message"
-            className={inputClassName}
-          />
+          <input type="text" name="message" className={inputClassName} />
         </label>
       </p>
       <p>
@@ -77,8 +69,8 @@ export default function NewPost() {
           {errors?.file ? (
             <em className="text-red-600">{errors.file}</em>
           ) : null}
-        {/* <input id="file" type="file" name="file" multiple/> */}
-        <input id="file" type="text" name="file" className={inputClassName}/>
+          {/* <input id="file" type="file" name="file" multiple/> */}
+          <input id="file" type="text" name="file" className={inputClassName} />
         </label>
       </p>
       <p className="text-right">
