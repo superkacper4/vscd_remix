@@ -41,12 +41,18 @@ export const action: ActionFunction = async ({ request, params }) => {
   invariant(typeof file === "string", "file must be a string");
 
   const fileIdTmp = uuidv4();
-  const filesTmp = [{ path: "xd", id: fileIdTmp }];
-  const filesId = [{ id: fileIdTmp }];
+  const fileIdTmp2 = uuidv4();
+  const filesTmp = [
+    { path: "nowe", id: fileIdTmp },
+    { path: "drugie", id: fileIdTmp2 },
+  ];
+  const filesId = [{ id: fileIdTmp }, { id: fileIdTmp2 }];
 
   await createFiles(filesTmp); // create files in tmp s3 folder
   const commit = await createCommit({ postSlug, message, userId }); // create commit and s3 folder
   await createFilesOnCommits({ commitId: commit.id, filesId }); // connect commits and files to each other
+
+  // move files in s3 to commit folder
 
   return redirect("/posts");
 };

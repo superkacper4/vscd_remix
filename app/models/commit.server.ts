@@ -15,6 +15,16 @@ export async function getCommit(id: string) {
   return prisma.commit.findUnique({ where: { id } });
 }
 
+export const getNewestCommit = async ({
+  postSlug,
+}: Pick<Commit, "postSlug">) => {
+  return prisma.commit.findMany({
+    where: { postSlug },
+    orderBy: { updatedAt: "desc" },
+    take: 1,
+  });
+};
+
 export async function createCommit({
   postSlug,
   message,

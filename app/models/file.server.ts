@@ -1,7 +1,15 @@
-import type { File } from "@prisma/client";
+import type { Commit, File } from "@prisma/client";
 import { connect } from "http2";
 import { url } from "inspector";
 import { prisma } from "~/db.server";
+
+export async function getFiles({ id }: { id: string[] }) {
+  return prisma.file.findMany({
+    where: { id: { in: id } },
+    select: { path: true, id: true },
+    // orderBy: { updatedAt: "desc" },
+  });
+}
 
 export async function createFiles(filesArr: {
   filesArr: {
