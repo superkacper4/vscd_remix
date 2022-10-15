@@ -1,9 +1,10 @@
 import { Link } from "@remix-run/react";
-import { LinksFunction } from "@remix-run/server-runtime";
-import Nav from "~/components/Nav"
+import type { LinksFunction } from "@remix-run/server-runtime";
+import AddNewButton from "~/components/AddNewButton";
+import Nav from "~/components/Nav";
 import PostTile from "~/components/PostTile";
-import { getPosts } from "~/models/post.server";
-import styles from './PostsPage.css'
+import type { getPosts } from "~/models/post.server";
+import styles from "./PostsPage.css";
 
 type LoaderData = {
   posts: Awaited<ReturnType<typeof getPosts>>;
@@ -11,18 +12,14 @@ type LoaderData = {
 
 export const postsPageLinks: LinksFunction = () => {
   return [{ rel: "stylesheet", href: styles }];
-}
+};
 
-const PostsPage = ({posts}: LoaderData) => {
-    return (
-      <main className="posts-bg">
-      <Nav title="Posts"/>
+const PostsPage = ({ posts }: LoaderData) => {
+  return (
+    <main className="posts-bg">
+      <Nav title="Posts" />
       <div className="posts-bg-content">
-        <div className="posts-bg-add-button">
-          <Link to="admin">
-            + New
-          </Link>
-        </div>
+        <AddNewButton url="admin" label="+ New Post" />
         <h1 className="h1">Posts</h1>
         <div className="posts-bg-wrapper">
           {posts.map((post) => (
@@ -35,8 +32,8 @@ const PostsPage = ({posts}: LoaderData) => {
           ))}
         </div>
       </div>
-      </main>
-    );
-}
+    </main>
+  );
+};
 
-export default PostsPage
+export default PostsPage;

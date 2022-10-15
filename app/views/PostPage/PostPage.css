@@ -1,0 +1,33 @@
+.post-bg {
+  background-color: rgb(98, 98, 98);
+  min-height: 100vh;
+  color: white;
+}
+
+.post-bg-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+}
+
+.post-bg-content {
+  width: 100%;
+  max-width: 1000px;
+}
+
+.post-bg-content .h2 {
+  width: 100%;
+  font-size: 3rem;
+}
+
+.fileTile {
+  width: 100%;
+  padding: 0.5rem;
+  border-bottom: 3px rgba(255, 171, 17, 1) solid;
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

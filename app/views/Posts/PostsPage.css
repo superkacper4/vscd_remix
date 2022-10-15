@@ -1,43 +1,33 @@
-.posts-bg{
-    background-color: rgb(98, 98, 98);
-    min-height: 100vh;
-    color: white;
+.posts-bg {
+  background-color: rgb(98, 98, 98);
+  min-height: 100vh;
+  color: white;
 }
 
-.posts-bg-content{
-    padding: 0 1rem;
-    position: relative;
+.posts-bg-content {
+  padding: 0 1rem;
+  position: relative;
 }
 
-.posts-bg .h1{
-    font-size: 24px;
+.posts-bg .h1 {
+  font-size: 24px;
 }
 
-.posts-bg-add-button{
-    font-size: 20px;
-    background-color: rgba(181, 79, 20, 0.6);
-    padding: 5px;
-    border-radius: 0.25rem;
-    position: fixed;
-    right: 5px;
-    top: 85px;
-}
-
-.posts-bg-wrapper{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 1rem 0.5rem;
+.posts-bg-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem 0.5rem;
 }
 
 @media (min-width: 650px) {
-    .posts-bg-content{
-        padding: 0 2rem;
-        position: relative;
-    }
-    
-    .posts-bg-wrapper{
-        padding: 2rem;
-    }
+  .posts-bg-content {
+    padding: 0 2rem;
+    position: relative;
+  }
+
+  .posts-bg-wrapper {
+    padding: 2rem;
+  }
 }
