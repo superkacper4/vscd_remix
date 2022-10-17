@@ -1,23 +1,24 @@
-.z-index-5{
-    z-index: 5;
-  }
+:root {
+  /* colors */
+  --mainBgDark: rgb(98, 98, 98);
+  --firstColor: rgba(255, 171, 17, 1);
+  --secondColor: rgba(181, 80, 20, 1);
+  --navColor: rgba(181, 79, 20, 0.6);
+  --shadowColor: rgba(66, 68, 90, 1);
+  --fontColor: #ffffff;
 
-.main-bg{
-    background-color: rgba(181, 80, 20, 1);
-    background-image: radial-gradient(circle, rgba(181, 80, 20, 1) 0%, rgba(255, 171, 17, 1) 100%);  
-    background-size: 400% 400%;
-    animation: gradient 15s ease infinite;
-  }
-  
-  
-  @keyframes gradient {
-    0% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
-    }
-    100% {
-      background-position: 0% 50%;
-    }
-  }
+  /* font size */
+  --regularFontSize: 14px;
+  --regularHeadingFontSize: 20px;
+  --bigHeadingFontSize: 24px;
+
+  /* margins */
+  --smallMargin: 0.5rem;
+  --regularMargin: 2rem;
+
+  /* z-index */
+  --z5: 5;
+
+  /* border width */
+  --regularBorderWidth: 3px;
+}

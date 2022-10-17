@@ -1,7 +1,7 @@
 .posts-bg {
-  background-color: rgb(98, 98, 98);
+  background-color: var(--mainBgDark);
   min-height: 100vh;
-  color: white;
+  color: var(--fontColor);
 }
 
 .posts-bg-content {
@@ -10,7 +10,7 @@
 }
 
 .posts-bg .h1 {
-  font-size: 24px;
+  font-size: var(--bigHeadingFontSize);
 }
 
 .posts-bg-wrapper {

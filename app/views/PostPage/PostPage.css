@@ -1,7 +1,7 @@
 .post-bg {
-  background-color: rgb(98, 98, 98);
+  background-color: var(--mainBgDark);
   min-height: 100vh;
-  color: white;
+  color: var(--fontColor);
 }
 
 .post-bg-wrapper {
@@ -19,14 +19,14 @@
 
 .post-bg-content .h2 {
   width: 100%;
-  font-size: 3rem;
+  font-size: var(--regularHeadingFontSize);
 }
 
 .fileTile {
   width: 100%;
-  padding: 0.5rem;
-  border-bottom: 3px rgba(255, 171, 17, 1) solid;
-  margin-bottom: 2rem;
+  padding: var(--smallMargin);
+  border-bottom: var(--regularBorderWidth) var(--firstColor) solid;
+  margin-bottom: var(--regularMargin);
   display: flex;
   justify-content: center;
   align-items: center;
