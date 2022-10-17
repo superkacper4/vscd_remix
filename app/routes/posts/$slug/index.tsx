@@ -5,39 +5,58 @@ import { Link, useLoaderData } from "@remix-run/react";
 import { getPost } from "~/models/post.server";
 import invariant from "tiny-invariant";
 
-import type { Post, File } from "@prisma/client";
-import { getNewestCommit } from "~/models/commit.server";
+import type { Post, File, Commit, User } from "@prisma/client";
+import { getCommit, getCommits, getNewestCommit } from "~/models/commit.server";
 import { getFiles } from "~/models/file.server";
 import { getFilesOnCommits } from "~/models/filesOnCommits.server";
 import PostPage, { postPageLinks } from "~/views/PostPage";
 import { navLinks } from "~/components/Nav";
 import { addNewButtonLinks } from "~/components/AddNewButton";
+import { getUserById } from "~/models/user.server";
 
 type LoaderData = {
   post: Post;
-  // newestCommit: Commit;
-  files: File[];
+  newestCommit: Commit[] | undefined;
+  commits: Commit[] | undefined;
+  files: File[] | undefined;
+  user: User | undefined;
 };
 
-export const loader: LoaderFunction = async ({ params }) => {
+export const loader: LoaderFunction = async ({ params, request }) => {
   invariant(params.slug, `params.slug is required`);
+  const url = new URL(request.url);
 
   const post = await getPost(params.slug);
-  let files;
-  const newestCommit = await getNewestCommit({ postSlug: params.slug });
 
-  if (newestCommit.length > 0) {
+  let files;
+  let user;
+  const commitId = url.searchParams.get("id");
+  const newestCommit = await getNewestCommit({ postSlug: params.slug });
+  const commits = await getCommits({ postSlug: params.slug });
+
+  if (!commitId && newestCommit.length > 0) {
     const filesOnCommits = await getFilesOnCommits({
       commitId: newestCommit[0]?.id,
     });
     const filesIdArray = filesOnCommits.map((file) => file?.fileId);
     files = await getFiles({ id: filesIdArray });
+    user = await getUserById(newestCommit[0].userId);
+  }
+
+  if (commitId) {
+    const filesOnCommits = await getFilesOnCommits({
+      commitId,
+    });
+    const filesIdArray = filesOnCommits.map((file) => file?.fileId);
+    const commit = await getCommit(commitId); // this needs more protection (to only download commits from good post)
+    files = await getFiles({ id: filesIdArray });
+    user = await getUserById(commit.userId);
   }
 
   const postSlug = params.slug;
 
   invariant(post, `Post not found: ${postSlug}`);
-  return json<LoaderData>({ post, files });
+  return json<LoaderData>({ post, files, newestCommit, user, commits });
 };
 
 export const links: LinksFunction = () => {
@@ -45,6 +64,15 @@ export const links: LinksFunction = () => {
 };
 
 export default function PostSlug() {
-  const { post, files } = useLoaderData() as LoaderData;
-  return <PostPage post={post} files={files} />;
+  const { post, files, newestCommit, user, commits } =
+    useLoaderData() as LoaderData;
+  return (
+    <PostPage
+      post={post}
+      files={files}
+      commit={newestCommit[0]}
+      user={user}
+      commits={commits}
+    />
+  );
 }

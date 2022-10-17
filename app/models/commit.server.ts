@@ -6,7 +6,7 @@ export type { Post } from "@prisma/client";
 export async function getCommits({ postSlug }: Pick<Commit, "postSlug">) {
   return prisma.commit.findMany({
     where: { postSlug },
-    select: { message: true, id: true },
+    // select: { message: true, id: true },
     orderBy: { updatedAt: "desc" },
   });
 }

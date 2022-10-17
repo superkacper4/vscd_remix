@@ -6,7 +6,6 @@ import { prisma } from "~/db.server";
 export async function getFiles({ id }: { id: string[] }) {
   return prisma.file.findMany({
     where: { id: { in: id } },
-    select: { path: true, id: true },
     // orderBy: { updatedAt: "desc" },
   });
 }
