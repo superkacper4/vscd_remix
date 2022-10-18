@@ -31,24 +31,33 @@ const PostPage = ({
       <div className="post-bg-wrapper">
         <div className="post-bg-content">
           <h1 className="my-6 border-b-2 text-center text-3xl">{post.slug}</h1>
-          <h2 className="my-4 text-center text-xl">{commit?.message}</h2>
-          <h3 className="my-4 text-center text-xl">{user?.email}</h3>
-          <Form method="get">
-            {commits?.map((commit) => {
-              return (
-                <p>
-                  <Link to={`?id=${commit.id}`} replace>
-                    {commit.id}
-                  </Link>
-                </p>
-              );
-            })}
-          </Form>
+          <div className="commitInfoWrapper">
+            <h3 className="h3">{user?.email}</h3>
+            <p className="p">{commit?.message}</p>
+          </div>
+          <div className="commitSelector">
+            <Form method="get">
+              {commits?.map((commit) => {
+                return (
+                  <p>
+                    <Link to={`?id=${commit.id}`} replace>
+                      {commit.id}
+                    </Link>
+                  </p>
+                );
+              })}
+            </Form>
+          </div>
           <h2 className="h2">Files:</h2>
           {files?.map((file) => (
             <div className="fileTile" key={file.id}>
               <p>{file.path}</p>
-              <p>{file.createdAt}</p>
+              <p className="date">
+                {String(file.createdAt).slice(
+                  0,
+                  String(file.createdAt).indexOf("T")
+                )}
+              </p>
             </div>
           ))}
         </div>

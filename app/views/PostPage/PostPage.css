@@ -17,9 +17,32 @@
   max-width: 1000px;
 }
 
-.post-bg-content .h2 {
+.post-bg-content .p {
+  font-size: var(----regularFontSize);
+}
+
+.post-bg-content .h3 {
+  color: var(--secondaryFontColor);
+}
+
+.post-bg-content .commitInfoWrapper {
   width: 100%;
-  font-size: var(--regularHeadingFontSize);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.post-bg-content .commitSelector {
+  min-width: 200px;
+  max-height: 500px;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  left: 5px;
+  top: 85px;
+  background-color: var(--secondColor);
 }
 
 .fileTile {
@@ -28,6 +51,10 @@
   border-bottom: var(--regularBorderWidth) var(--firstColor) solid;
   margin-bottom: var(--regularMargin);
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
+}
+
+.fileTile .date {
+  color: var(--secondaryFontColor);
 }

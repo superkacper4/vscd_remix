@@ -20,6 +20,7 @@ type LoaderData = {
   commits: Commit[] | undefined;
   files: File[] | undefined;
   user: User | undefined;
+  commit: Commit | undefined;
 };
 
 export const loader: LoaderFunction = async ({ params, request }) => {
@@ -30,6 +31,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
   let files;
   let user;
+  let commit;
   const commitId = url.searchParams.get("id");
   const newestCommit = await getNewestCommit({ postSlug: params.slug });
   const commits = await getCommits({ postSlug: params.slug });
@@ -48,7 +50,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       commitId,
     });
     const filesIdArray = filesOnCommits.map((file) => file?.fileId);
-    const commit = await getCommit(commitId); // this needs more protection (to only download commits from good post)
+    commit = await getCommit(commitId); // this needs more protection (to only download commits from good post)
     files = await getFiles({ id: filesIdArray });
     user = await getUserById(commit.userId);
   }
@@ -56,7 +58,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   const postSlug = params.slug;
 
   invariant(post, `Post not found: ${postSlug}`);
-  return json<LoaderData>({ post, files, newestCommit, user, commits });
+  return json<LoaderData>({ post, files, newestCommit, user, commits, commit });
 };
 
 export const links: LinksFunction = () => {
@@ -64,13 +66,13 @@ export const links: LinksFunction = () => {
 };
 
 export default function PostSlug() {
-  const { post, files, newestCommit, user, commits } =
+  const { post, files, newestCommit, user, commits, commit } =
     useLoaderData() as LoaderData;
   return (
     <PostPage
       post={post}
       files={files}
-      commit={newestCommit[0]}
+      commit={commit ? commit : newestCommit[0]}
       user={user}
       commits={commits}
     />

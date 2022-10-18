@@ -5,7 +5,10 @@
   --secondColor: rgba(181, 80, 20, 1);
   --navColor: rgba(181, 79, 20, 0.6);
   --shadowColor: rgba(66, 68, 90, 1);
+
+  /* font colors */
   --fontColor: #ffffff;
+  --secondaryFontColor: #afafaf;
 
   /* font size */
   --regularFontSize: 14px;

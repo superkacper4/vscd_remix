@@ -2,9 +2,12 @@ import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
-import { createCommit, Post } from "~/models/commit.server";
+import { createCommit, getNewestCommit, Post } from "~/models/commit.server";
 import { createFiles } from "~/models/file.server";
-import { createFilesOnCommits } from "~/models/filesOnCommits.server";
+import {
+  createFilesOnCommits,
+  getFilesOnCommits,
+} from "~/models/filesOnCommits.server";
 import { getPost } from "~/models/post.server";
 import { requireUserId } from "~/session.server";
 import { v4 as uuidv4 } from "uuid";
@@ -22,6 +25,13 @@ export const action: ActionFunction = async ({ request, params }) => {
   invariant(params.slug, `params.slug is required`);
 
   const postSlug = params.slug;
+  // code belowe is for geting last commits files to compare them with files from cuurent commit (which is being created)
+  // const newestCommit = await getNewestCommit({ postSlug: params.slug });
+  // let newestCommitFiles;
+
+  // if (newestCommit.length > 0) {
+  //   newestCommitFiles = getFilesOnCommits({ commitId: newestCommit[0].id });
+  // }
 
   const formData = await request.formData();
 
