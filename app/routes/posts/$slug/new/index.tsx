@@ -15,7 +15,7 @@ import { v4 as uuidv4 } from "uuid";
 type ActionData =
   | {
       message: null | string;
-      file: null | string;
+      files: null | string;
     }
   | undefined;
 
@@ -36,11 +36,11 @@ export const action: ActionFunction = async ({ request, params }) => {
   const formData = await request.formData();
 
   const message = formData.get("message");
-  const file = formData.get("file");
+  const files = formData.getAll("file");
 
   const errors: ActionData = {
     message: message ? null : "Message is required",
-    file: file ? null : "file is required",
+    files: files ? null : "file is required",
   };
   const hasErrors = Object.values(errors).some((errorMessage) => errorMessage);
   if (hasErrors) {
@@ -48,7 +48,7 @@ export const action: ActionFunction = async ({ request, params }) => {
   }
 
   invariant(typeof message === "string", "title must be a string");
-  invariant(typeof file === "string", "file must be a string");
+  // invariant(typeof files === "string", "file must be a string");
 
   const fileIdTmp = uuidv4();
   const fileIdTmp2 = uuidv4();
@@ -89,8 +89,14 @@ export default function NewPost() {
           {errors?.file ? (
             <em className="text-red-600">{errors.file}</em>
           ) : null}
-          {/* <input id="file" type="file" name="file" multiple/> */}
-          <input id="file" type="text" name="file" className={inputClassName} />
+          {/* <input id="file" type="text" name="file" /> */}
+          <input
+            id="file"
+            type="file"
+            multiple
+            name="file"
+            className={inputClassName}
+          />
         </label>
       </p>
       <p className="text-right">
