@@ -51,7 +51,7 @@ const PostPage = ({
           <h2 className="h2">Files:</h2>
           {files?.map((file) => (
             <div className="fileTile" key={file.id}>
-              <p>{file.path}</p>
+              <p>{file.name}</p>
               <p className="date">
                 {String(file.createdAt).slice(
                   0,

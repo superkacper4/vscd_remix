@@ -29,13 +29,17 @@ export async function createCommit({
   postSlug,
   message,
   userId,
+  commitId,
 }: Pick<Commit, "message"> & {
   userId: User["id"];
 } & {
   postSlug: Post["slug"];
+} & {
+  commitId: string;
 }) {
   return prisma.commit.create({
     data: {
+      id: commitId,
       message,
       post: {
         connect: {

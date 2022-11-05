@@ -4,12 +4,12 @@ import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
 async function seed() {
-  const email = "kucza06@wp.pl";
-
   // cleanup the existing database
-  await prisma.user.delete({ where: { email } }).catch(() => {
-    // no worries if it doesn't exist yet
-  });
+  await prisma.filesOnCommits.deleteMany({});
+  await prisma.post.deleteMany({});
+  await prisma.user.deleteMany({});
+
+  const email = "kucza06@wp.pl";
 
   const hashedPassword = await bcrypt.hash("admin123", 10);
 
@@ -31,9 +31,6 @@ async function seed() {
       userId: user.id,
     },
   });
-
-  await prisma.post.deleteMany({})
-  // await prisma.user.deleteMany({})
 
   console.log(`Database has been seeded. 🌱`);
 }

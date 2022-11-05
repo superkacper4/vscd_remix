@@ -33,15 +33,17 @@ export const action: ActionFunction = async ({ request, params }) => {
   // if (newestCommit.length > 0) {
   //   newestCommitFiles = getFilesOnCommits({ commitId: newestCommit[0].id });
   // }
+  const commitId = uuidv4();
 
   let uploadHandler: UploadHandler = async ({ filename, name, data }) => {
     if (filename) {
       // data.next().then((value) => console.log(value.value));
-      const content = await data.next().then((value) => value.value);
+      const content = await data.next().then((data) => data.value);
       const filesForPrisma = {
         name: filename,
         id: uuidv4(),
         content,
+        commitId,
       };
 
       // console.log(filesForPrisma);
@@ -57,7 +59,7 @@ export const action: ActionFunction = async ({ request, params }) => {
     }
 
     if ((name = "message")) {
-      const content = await data.next().then((value) => value.value);
+      const content = await data.next().then((data) => data.value);
       const message = String.fromCharCode.apply(null, content);
       return message;
     }
@@ -76,8 +78,8 @@ export const action: ActionFunction = async ({ request, params }) => {
 
   console.log("msg", message, "files", files);
 
-  const commit = await createCommit({ postSlug, message, userId }); // create commit and s3 folder
-  await createFilesOnCommits({ commitId: commit.id, filesId: files }); // connect commits and files to each other
+  const commit = await createCommit({ postSlug, message, userId, commitId }); // create commit and s3 folder
+  await createFilesOnCommits({ commitId, filesId: files }); // connect commits and files to each other
 
   // move files in s3 to commit folder
 
