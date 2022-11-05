@@ -21,7 +21,7 @@ export async function createFilesOnCommits({
   return prisma.filesOnCommits.createMany({
     data: filesId.map((fileId) => ({
       commitId,
-      fileId: fileId.id,
+      fileId: fileId,
     })),
   });
 }

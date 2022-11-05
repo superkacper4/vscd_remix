@@ -41,6 +41,7 @@ model Note {
 
 model File {
   id   String @id @default(cuid())
+  name   String
   path String
 
   commits FilesOnCommits[]

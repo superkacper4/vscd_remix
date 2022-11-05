@@ -1,9 +1,13 @@
-import type { ActionFunction, LoaderFunction } from "@remix-run/node";
+import type { ActionFunction, UploadHandler, uploa } from "@remix-run/node";
+import {
+  LoaderFunction,
+  unstable_parseMultipartFormData,
+} from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
 import { createCommit, getNewestCommit, Post } from "~/models/commit.server";
-import { createFiles } from "~/models/file.server";
+import { createFiles, uploadHandler } from "~/models/file.server";
 import {
   createFilesOnCommits,
   getFilesOnCommits,
@@ -11,6 +15,7 @@ import {
 import { getPost } from "~/models/post.server";
 import { requireUserId } from "~/session.server";
 import { v4 as uuidv4 } from "uuid";
+import { useState } from "react";
 
 type ActionData =
   | {
@@ -33,38 +38,66 @@ export const action: ActionFunction = async ({ request, params }) => {
   //   newestCommitFiles = getFilesOnCommits({ commitId: newestCommit[0].id });
   // }
 
-  const formData = await request.formData();
+  let uploadHandler: UploadHandler = async ({ filename, name, data }) => {
+    if (filename) {
+      // console.log(filename, name, stream, data);
+      // data.next().then((value) => console.log(value.value));
+      const content = await data.next().then((value) => value.value);
+      const filesForPrisma = [
+        {
+          name: filename,
+          id: uuidv4(),
+          content,
+        },
+      ];
+      console.log(filesForPrisma);
+      const createdFile = await createFiles(filesForPrisma); // create files in tmp s3 folder
+
+      console.log("createdFile", createdFile);
+
+      const fileId = createdFile[0].id;
+      // const filesId = "xd";
+      return fileId;
+    }
+
+    if ((name = "message")) {
+      const content = await data.next().then((value) => value.value);
+      const message = String.fromCharCode.apply(null, content);
+      return message;
+    }
+  };
+
+  const formData = await unstable_parseMultipartFormData(
+    request,
+    uploadHandler
+  );
+  console.log("from", formData);
+
+  // const formData = await request.formData();
 
   const message = formData.get("message");
   const files = formData.getAll("file");
 
-  const errors: ActionData = {
-    message: message ? null : "Message is required",
-    files: files ? null : "file is required",
-  };
-  const hasErrors = Object.values(errors).some((errorMessage) => errorMessage);
-  if (hasErrors) {
-    return json<ActionData>(errors);
-  }
+  console.log("msg", message, "files", files);
 
-  invariant(typeof message === "string", "title must be a string");
-  // invariant(typeof files === "string", "file must be a string");
-
-  const fileIdTmp = uuidv4();
-  const fileIdTmp2 = uuidv4();
-  const filesTmp = [
-    { path: "nowe", id: fileIdTmp },
-    { path: "drugie", id: fileIdTmp2 },
-  ];
-  const filesId = [{ id: fileIdTmp }, { id: fileIdTmp2 }];
-
-  await createFiles(filesTmp); // create files in tmp s3 folder
   const commit = await createCommit({ postSlug, message, userId }); // create commit and s3 folder
-  await createFilesOnCommits({ commitId: commit.id, filesId }); // connect commits and files to each other
+  await createFilesOnCommits({ commitId: commit.id, filesId: files }); // connect commits and files to each other
 
   // move files in s3 to commit folder
 
-  return redirect("/posts");
+  // const errors: ActionData = {
+  //   message: message ? null : "Message is required",
+  //   files: files ? null : "file is required",
+  // };
+  // const hasErrors = Object.values(errors).some((errorMessage) => errorMessage);
+  // if (hasErrors) {
+  //   return json<ActionData>(errors);
+  // }
+
+  // invariant(typeof message === "string", "title must be a string");
+  // // invariant(typeof files === "string", "file must be a string");
+
+  return redirect(`/posts/${postSlug}`);
 };
 
 const inputClassName = `w-full rounded border border-gray-500 px-2 py-1 text-lg`;
@@ -89,7 +122,6 @@ export default function NewPost() {
           {errors?.file ? (
             <em className="text-red-600">{errors.file}</em>
           ) : null}
-          {/* <input id="file" type="text" name="file" /> */}
           <input
             id="file"
             type="file"

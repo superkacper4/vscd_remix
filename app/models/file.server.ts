@@ -9,7 +9,7 @@ import multerS3 from "multer-s3";
 import path from "path";
 
 import { S3Client } from "@aws-sdk/client-s3";
-import type { Readable } from "stream";
+import { Readable } from "stream";
 import { Upload } from "@aws-sdk/lib-storage";
 import type { UploadHandler } from "@remix-run/node";
 
@@ -30,23 +30,31 @@ export async function getFiles({ id }: { id: string[] }) {
   });
 }
 
-export async function createFiles(filesArr: {
+export async function createFiles(
   filesArr: {
-    path: string;
+    name: string;
     id: string;
-  }[];
-}) {
-  uploadHandler({
-    stream: filesArr[0].path,
-    filename: filesArr[0].id,
-  });
-  // Prisma DB
-  return prisma.file.createMany({
-    data: filesArr.map((file) => ({
-      id: file.id,
-      path: file.path,
-    })),
-  });
+    content: any;
+  }[]
+) {
+  return await Promise.all(
+    filesArr.map(async (file) => {
+      // AWS connection
+      const filePath = await uploadHandler({
+        stream: file.content,
+        filename: file.name,
+      });
+
+      // Prisma DB
+      return prisma.file.create({
+        data: {
+          name: file.name,
+          id: file.id,
+          path: filePath,
+        },
+      });
+    })
+  );
 }
 
 const storage = new S3Client({
@@ -59,7 +67,8 @@ const storage = new S3Client({
   region: "eu-central-1",
 });
 
-export async function uploadStreamToSpaces(stream: Readable, filename: string) {
+export async function uploadStreamToSpaces(stream: string, filename: string) {
+  console.log("uploadStream");
   return new Upload({
     client: storage,
     leavePartsOnError: false,
@@ -71,41 +80,20 @@ export async function uploadStreamToSpaces(stream: Readable, filename: string) {
   }).done();
 }
 
-export const uploadHandler: UploadHandler = async ({ stream, filename }) => {
+export const uploadHandler = async ({
+  stream,
+  filename,
+}: {
+  stream: string;
+  filename: string;
+}) => {
   const upload = await uploadStreamToSpaces(stream, filename);
 
-  console.log(upload);
+  const fileLocation = upload.Location;
 
   if (upload.$metadata.httpStatusCode === 200) {
-    return filename;
+    return fileLocation;
   }
 
   return "";
 };
-
-// export async function createAWSFiles(filesArr: {
-//   filesArr: {
-//     path: string;
-//     id: string;
-//   }[];
-// }) {
-//   // AWS S3
-//   const s3 = new aws.S3({ apiVersion: "2006-03-01" });
-//   const upload = multer({
-//     storage: multerS3({
-//       s3,
-//       bucket: "vscd",
-//       accessKeyId: AWS_KEY_ID,
-//       secretAccessKey: AWS_SECRET_KEY,
-//       metadata: (req, file, cb) => {
-//         cb(null, { fieldName: file.fieldname });
-//       },
-//       key: (req, file, cb) => {
-//         const ext = path.extname(file.originalname);
-//         cb(null, `${filesArr[0]?.id}${ext}`);
-//       },
-//     }),
-//   });
-
-//   upload.single(filesArr[0].path);
-// }
