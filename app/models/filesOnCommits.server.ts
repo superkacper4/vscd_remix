@@ -25,8 +25,3 @@ export async function createFilesOnCommits({
     })),
   });
 }
-
-//   data = [{
-//     commitId,
-//     fileId
-//   }]

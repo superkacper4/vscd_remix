@@ -30,31 +30,25 @@ export async function getFiles({ id }: { id: string[] }) {
   });
 }
 
-export async function createFiles(
-  filesArr: {
-    name: string;
-    id: string;
-    content: any;
-  }[]
-) {
-  return await Promise.all(
-    filesArr.map(async (file) => {
-      // AWS connection
-      const filePath = await uploadHandler({
-        stream: file.content,
-        filename: file.name,
-      });
+export async function createFile(file: {
+  name: string;
+  id: string;
+  content: any;
+}) {
+  // AWS connection
+  const filePath = await uploadHandler({
+    stream: file.content,
+    filename: file.name,
+  });
 
-      // Prisma DB
-      return prisma.file.create({
-        data: {
-          name: file.name,
-          id: file.id,
-          path: filePath,
-        },
-      });
-    })
-  );
+  // Prisma DB
+  return prisma.file.create({
+    data: {
+      name: file.name,
+      id: file.id,
+      path: filePath,
+    },
+  });
 }
 
 const storage = new S3Client({

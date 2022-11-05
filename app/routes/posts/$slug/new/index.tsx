@@ -1,13 +1,10 @@
-import type { ActionFunction, UploadHandler, uploa } from "@remix-run/node";
-import {
-  LoaderFunction,
-  unstable_parseMultipartFormData,
-} from "@remix-run/node";
-import { json, redirect } from "@remix-run/node";
-import { Form, useActionData, useLoaderData } from "@remix-run/react";
+import type { ActionFunction, UploadHandler } from "@remix-run/node";
+import { unstable_parseMultipartFormData } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
+import { Form, useActionData } from "@remix-run/react";
 import invariant from "tiny-invariant";
 import { createCommit, getNewestCommit, Post } from "~/models/commit.server";
-import { createFiles, uploadHandler } from "~/models/file.server";
+import { createFile } from "~/models/file.server";
 import {
   createFilesOnCommits,
   getFilesOnCommits,
@@ -15,7 +12,6 @@ import {
 import { getPost } from "~/models/post.server";
 import { requireUserId } from "~/session.server";
 import { v4 as uuidv4 } from "uuid";
-import { useState } from "react";
 
 type ActionData =
   | {
@@ -40,23 +36,23 @@ export const action: ActionFunction = async ({ request, params }) => {
 
   let uploadHandler: UploadHandler = async ({ filename, name, data }) => {
     if (filename) {
-      // console.log(filename, name, stream, data);
       // data.next().then((value) => console.log(value.value));
       const content = await data.next().then((value) => value.value);
-      const filesForPrisma = [
-        {
-          name: filename,
-          id: uuidv4(),
-          content,
-        },
-      ];
-      console.log(filesForPrisma);
-      const createdFile = await createFiles(filesForPrisma); // create files in tmp s3 folder
+      const filesForPrisma = {
+        name: filename,
+        id: uuidv4(),
+        content,
+      };
+
+      // console.log(filesForPrisma);
+      const createdFile = await createFile(filesForPrisma); // create files in tmp s3 folder
 
       console.log("createdFile", createdFile);
 
-      const fileId = createdFile[0].id;
-      // const filesId = "xd";
+      const fileId = createdFile.id;
+      console.log(filename, name, filesForPrisma);
+
+      // const fileId = "xd";
       return fileId;
     }
 
