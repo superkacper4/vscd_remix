@@ -35,11 +35,12 @@ export async function createFile(file: {
   id: string;
   content: any;
   commitId: string;
+  postSlug: string;
 }) {
   // AWS connection
   const filePath = await uploadHandler({
     stream: file.content,
-    filename: `${file.commitId}/${file.name}`,
+    filename: `${file.postSlug}/${file.commitId}/${file.name}`,
   });
 
   // Prisma DB

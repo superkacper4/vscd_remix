@@ -3,8 +3,8 @@ import { unstable_parseMultipartFormData } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Form, useActionData } from "@remix-run/react";
 import invariant from "tiny-invariant";
-import { createCommit, getNewestCommit, Post } from "~/models/commit.server";
-import { createFile } from "~/models/file.server";
+import { createCommit, getPreviousCommit, Post } from "~/models/commit.server";
+import { createFile, getFiles } from "~/models/file.server";
 import {
   createFilesOnCommits,
   getFilesOnCommits,
@@ -12,6 +12,7 @@ import {
 import { getPost } from "~/models/post.server";
 import { requireUserId } from "~/session.server";
 import { v4 as uuidv4 } from "uuid";
+import _ from "lodash";
 
 type ActionData =
   | {
@@ -21,46 +22,53 @@ type ActionData =
   | undefined;
 
 export const action: ActionFunction = async ({ request, params }) => {
-  const userId = await requireUserId(request);
+  const userId = await requireUserId(request); // get user creating commit
+  const commitId = uuidv4(); // genereate commit id
 
   invariant(params.slug, `params.slug is required`);
 
   const postSlug = params.slug;
-  // code belowe is for geting last commits files to compare them with files from cuurent commit (which is being created)
-  // const newestCommit = await getNewestCommit({ postSlug: params.slug });
-  // let newestCommitFiles;
 
-  // if (newestCommit.length > 0) {
-  //   newestCommitFiles = getFilesOnCommits({ commitId: newestCommit[0].id });
-  // }
-  const commitId = uuidv4();
+  const generatePreviousCommitFiles = async () => {
+    // defining clouseres to save prevoius commit files without global variable
+    let files = [];
+    const previousCommit = await getPreviousCommit({ postSlug });
+
+    const innerGeneratePreviousCommitFiles = async () => {
+      if (previousCommit.length > 0) {
+        const filesOnCommits = await getFilesOnCommits({
+          commitId: previousCommit[0]?.id,
+        });
+        const filesIdArray = filesOnCommits?.map((file) => file?.fileId);
+        files = await getFiles({ id: filesIdArray });
+        // console.log(files);
+        return files;
+      }
+    };
+    return innerGeneratePreviousCommitFiles;
+  };
 
   let uploadHandler: UploadHandler = async ({ filename, name, data }) => {
+    // handling form post method
     if (filename) {
-      // data.next().then((value) => console.log(value.value));
-      const content = await data.next().then((data) => data.value);
+      //handling file when recived from post method
+      const content = await data.next().then((data) => data.value); //get file STREAM
       const filesForPrisma = {
+        // prepare file format for prisma DB
         name: filename,
         id: uuidv4(),
         content,
         commitId,
+        postSlug,
       };
-
       // console.log(filesForPrisma);
-      const createdFile = await createFile(filesForPrisma); // create files in tmp s3 folder
-
-      console.log("createdFile", createdFile);
-
-      const fileId = createdFile.id;
-      console.log(filename, name, filesForPrisma);
-
-      // const fileId = "xd";
-      return fileId;
+      const createdFile = await createFile(filesForPrisma); // create files in prisma and AWS
+      return JSON.stringify(createdFile);
     }
-
     if ((name = "message")) {
-      const content = await data.next().then((data) => data.value);
-      const message = String.fromCharCode.apply(null, content);
+      //handling message when recived from post method
+      const content = await data.next().then((data) => data.value); //get message value
+      const message = String.fromCharCode.apply(null, content); // change 8bit format to string
       return message;
     }
   };
@@ -69,17 +77,48 @@ export const action: ActionFunction = async ({ request, params }) => {
     request,
     uploadHandler
   );
-  console.log("from", formData);
-
-  // const formData = await request.formData();
 
   const message = formData.get("message");
-  const files = formData.getAll("file");
+  const stringifiedFiles = formData.getAll("file");
 
-  console.log("msg", message, "files", files);
+  const files = stringifiedFiles.map((file) => {
+    // change each files from JSON.stringify back to objects
+    const parsedFile = JSON.parse(file);
+    return parsedFile;
+  });
 
-  const commit = await createCommit({ postSlug, message, userId, commitId }); // create commit and s3 folder
-  await createFilesOnCommits({ commitId, filesId: files }); // connect commits and files to each other
+  const generetedPreviousCommitFiles = await generatePreviousCommitFiles();
+  const previousCommitFiles = await generetedPreviousCommitFiles(); // using clouseres for previous commit files
+
+  const mergeFiles = (primaryArr, secondaryArr) => {
+    // merging old files with new ones (merge condition -> file name)
+    const concatedArr = primaryArr.concat(secondaryArr);
+
+    const sortedArr = concatedArr.sort(function (a, b) {
+      // sort files from oldest to newest
+      return new Date(a.createdAt) - new Date(b.createdAt);
+    });
+
+    const duplicatFreeObject = sortedArr.reduce(
+      // create an object to replace duplicats
+      (acc, cur) => ({ ...acc, [cur.name]: cur }),
+      {}
+    );
+
+    // crate array from duplicats free object
+    var duplicatFreeArray = Object.keys(duplicatFreeObject).map(
+      (key) => duplicatFreeObject[key]
+    );
+
+    const duplicatFreeFilesIds = duplicatFreeArray.map((file) => file.id);
+
+    return duplicatFreeFilesIds;
+  };
+
+  const mergedFilesIds = mergeFiles(files, previousCommitFiles);
+
+  await createCommit({ postSlug, message, userId, commitId }); // create commit and s3 folder
+  await createFilesOnCommits({ commitId, filesId: mergedFilesIds }); // connect commits and files to each other
 
   // move files in s3 to commit folder
 

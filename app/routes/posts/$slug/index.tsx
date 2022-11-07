@@ -6,7 +6,11 @@ import { getPost } from "~/models/post.server";
 import invariant from "tiny-invariant";
 
 import type { Post, File, Commit, User } from "@prisma/client";
-import { getCommit, getCommits, getNewestCommit } from "~/models/commit.server";
+import {
+  getCommit,
+  getCommits,
+  getPreviousCommit,
+} from "~/models/commit.server";
 import { getFiles } from "~/models/file.server";
 import { getFilesOnCommits } from "~/models/filesOnCommits.server";
 import PostPage, { postPageLinks } from "~/views/PostPage";
@@ -16,7 +20,7 @@ import { getUserById } from "~/models/user.server";
 
 type LoaderData = {
   post: Post;
-  newestCommit: Commit[] | undefined;
+  previousCommit: Commit[] | undefined;
   commits: Commit[] | undefined;
   files: File[] | undefined;
   user: User | undefined;
@@ -33,16 +37,16 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   let user;
   let commit;
   const commitId = url.searchParams.get("id");
-  const newestCommit = await getNewestCommit({ postSlug: params.slug });
+  const previousCommit = await getPreviousCommit({ postSlug: params.slug });
   const commits = await getCommits({ postSlug: params.slug });
 
-  if (!commitId && newestCommit.length > 0) {
+  if (!commitId && previousCommit.length > 0) {
     const filesOnCommits = await getFilesOnCommits({
-      commitId: newestCommit[0]?.id,
+      commitId: previousCommit[0]?.id,
     });
     const filesIdArray = filesOnCommits.map((file) => file?.fileId);
     files = await getFiles({ id: filesIdArray });
-    user = await getUserById(newestCommit[0].userId);
+    user = await getUserById(previousCommit[0].userId);
   }
 
   if (commitId) {
@@ -58,7 +62,14 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   const postSlug = params.slug;
 
   invariant(post, `Post not found: ${postSlug}`);
-  return json<LoaderData>({ post, files, newestCommit, user, commits, commit });
+  return json<LoaderData>({
+    post,
+    files,
+    previousCommit,
+    user,
+    commits,
+    commit,
+  });
 };
 
 export const links: LinksFunction = () => {
@@ -66,13 +77,13 @@ export const links: LinksFunction = () => {
 };
 
 export default function PostSlug() {
-  const { post, files, newestCommit, user, commits, commit } =
+  const { post, files, previousCommit, user, commits, commit } =
     useLoaderData() as LoaderData;
   return (
     <PostPage
       post={post}
       files={files}
-      commit={commit ? commit : newestCommit[0]}
+      commit={commit ? commit : previousCommit[0]}
       user={user}
       commits={commits}
     />
