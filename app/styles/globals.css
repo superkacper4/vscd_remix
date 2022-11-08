@@ -1,5 +1,8 @@
+@import url("https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap");
+
 :root {
   /* colors */
+  --lighterDark: rgb(163, 163, 163);
   --mainBgDark: rgb(98, 98, 98);
   --firstColor: rgba(255, 171, 17, 1);
   --secondColor: rgba(181, 80, 20, 1);
@@ -15,6 +18,9 @@
   --regularHeadingFontSize: 20px;
   --bigHeadingFontSize: 24px;
 
+  /* font family */
+  --mainFont: "PT Sans", sans-serif;
+
   /* margins */
   --smallMargin: 0.5rem;
   --regularMargin: 2rem;
@@ -24,4 +30,24 @@
 
   /* border width */
   --regularBorderWidth: 3px;
+}
+
+* {
+  font-family: var(--mainFont);
+}
+
+input {
+  background-color: transparent;
+  border: 2px solid var(--lighterDark);
+  width: 100%;
+  padding: 5px;
+  border-radius: 5px;
+}
+
+textarea {
+  background-color: transparent;
+  border: 2px solid var(--lighterDark);
+  width: 100%;
+  padding: 5px;
+  border-radius: 5px;
 }
