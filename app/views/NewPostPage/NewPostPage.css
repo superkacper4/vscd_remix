@@ -1,0 +1,16 @@
+.newPost-bg {
+  background-color: var(--mainBgDark);
+  min-height: 100vh;
+  color: var(--fontColor);
+}
+
+.newPost-bg-content {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.newPost-bg-wrapper {
+  width: 100%;
+  max-width: 1000px;
+}

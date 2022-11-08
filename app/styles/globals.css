@@ -30,6 +30,7 @@
 
   /* border width */
   --regularBorderWidth: 3px;
+  --smallerBorderWidth: 2px;
 }
 
 * {
@@ -38,16 +39,36 @@
 
 input {
   background-color: transparent;
-  border: 2px solid var(--lighterDark);
+  border: var(--smallerBorderWidth) solid var(--lighterDark);
   width: 100%;
   padding: 5px;
   border-radius: 5px;
+
+  transition: border 0.2s, background-color 0.2s;
+}
+
+input:hover {
+  border: var(--smallerBorderWidth) solid var(--firstColor);
+}
+
+input:focus {
+  background-color: var(--secondColor);
 }
 
 textarea {
   background-color: transparent;
-  border: 2px solid var(--lighterDark);
+  border: var(--smallerBorderWidth) solid var(--lighterDark);
   width: 100%;
   padding: 5px;
   border-radius: 5px;
+
+  transition: border 0.2s, background-color 0.2s;
+}
+
+textarea:hover {
+  border: var(--smallerBorderWidth) solid var(--firstColor);
+}
+
+textarea:focus {
+  background-color: var(--secondColor);
 }
