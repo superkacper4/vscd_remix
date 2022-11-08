@@ -19,7 +19,7 @@ const PostsPage = ({ posts }: LoaderData) => {
     <main className="posts-bg">
       <Nav title="Posts" />
       <div className="posts-bg-content">
-        <AddNewButton url="admin" label="+ New Post" />
+        <AddNewButton url="new" label="+ New Post" />
         <h1 className="h1">Posts</h1>
         <div className="posts-bg-wrapper">
           {posts.map((post) => (
