@@ -115,7 +115,9 @@ export const action: ActionFunction = async ({ request, params }) => {
     return duplicatFreeFilesIds;
   };
 
-  const mergedFilesIds = mergeFiles(files, previousCommitFiles);
+  const mergedFilesIds = previousCommitFiles
+    ? mergeFiles(files, previousCommitFiles)
+    : files.map((file) => file.id);
 
   await createCommit({ postSlug, message, userId, commitId }); // create commit and s3 folder
   await createFilesOnCommits({ commitId, filesId: mergedFilesIds }); // connect commits and files to each other
