@@ -1,0 +1,16 @@
+.newCommit-bg {
+  background-color: var(--mainBgDark);
+  min-height: 100vh;
+  color: var(--fontColor);
+}
+
+.newCommit-bg-content {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.newCommit-bg-wrapper {
+  width: 100%;
+  max-width: 1000px;
+}

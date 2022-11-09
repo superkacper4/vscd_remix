@@ -11,7 +11,7 @@ export const links: LinksFunction = () => {
 };
 
 export const action: ActionFunction = async ({ request }) => {
-  newPostPageAction({ request });
+  await newPostPageAction({ request });
   console.log("action");
 
   return redirect("/posts");

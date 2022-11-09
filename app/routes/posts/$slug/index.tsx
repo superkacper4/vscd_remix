@@ -1,7 +1,12 @@
 import { marked } from "marked";
-import type { LinksFunction, LoaderFunction } from "@remix-run/node";
+import type {
+  ActionFunction,
+  LinksFunction,
+  LoaderFunction,
+} from "@remix-run/node";
+import { redirect } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { Link, useLoaderData } from "@remix-run/react";
+import { Link, useActionData, useLoaderData } from "@remix-run/react";
 import { getPost } from "~/models/post.server";
 import invariant from "tiny-invariant";
 
@@ -13,10 +18,11 @@ import {
 } from "~/models/commit.server";
 import { getFiles } from "~/models/file.server";
 import { getFilesOnCommits } from "~/models/filesOnCommits.server";
-import PostPage, { postPageLinks } from "~/views/PostPage";
+import PostPage, { postPageAction, postPageLinks } from "~/views/PostPage";
 import { navLinks } from "~/components/Nav";
 import { addNewButtonLinks } from "~/components/AddNewButton";
 import { getUserById } from "~/models/user.server";
+import { useEffect } from "react";
 
 type LoaderData = {
   post: Post;
@@ -76,9 +82,29 @@ export const links: LinksFunction = () => {
   return [...postPageLinks(), ...navLinks(), ...addNewButtonLinks()];
 };
 
+export const action: ActionFunction = async ({ request, params }) => {
+  const downloadUrl = await postPageAction({ request });
+  const postSlug = params.slug;
+
+  return downloadUrl;
+};
+
 export default function PostSlug() {
   const { post, files, previousCommit, user, commits, commit } =
     useLoaderData() as LoaderData;
+
+  const actionData = useActionData();
+
+  useEffect(() => {
+    console.log(actionData);
+
+    if (actionData) {
+      let alink = document.createElement("a");
+      alink.href = actionData;
+      alink.click();
+    }
+  }, [actionData]);
+
   return (
     <PostPage
       post={post}

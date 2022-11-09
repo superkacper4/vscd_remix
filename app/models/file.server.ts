@@ -2,6 +2,8 @@ import type { Commit, File } from "@prisma/client";
 import { connect } from "http2";
 import { url } from "inspector";
 import { prisma } from "~/db.server";
+import fs from "fs";
+import https from "https";
 
 import aws from "aws-sdk";
 import multer from "multer";
@@ -9,7 +11,6 @@ import multerS3 from "multer-s3";
 import path from "path";
 
 import { S3Client } from "@aws-sdk/client-s3";
-import { Readable } from "stream";
 import { Upload } from "@aws-sdk/lib-storage";
 import type { UploadHandler } from "@remix-run/node";
 
@@ -37,10 +38,11 @@ export async function createFile(file: {
   commitId: string;
   postSlug: string;
 }) {
+  const fileKey = `${file.postSlug}/${file.commitId}/${file.name}`;
   // AWS connection
-  const filePath = await uploadHandler({
+  await uploadHandler({
     stream: file.content,
-    filename: `${file.postSlug}/${file.commitId}/${file.name}`,
+    filename: fileKey,
   });
 
   // Prisma DB
@@ -48,7 +50,7 @@ export async function createFile(file: {
     data: {
       name: file.name,
       id: file.id,
-      path: filePath,
+      path: fileKey,
     },
   });
 }
@@ -93,3 +95,23 @@ export const uploadHandler = async ({
 
   return "";
 };
+
+export async function downloadFileFromS3(fileKey: string) {
+  aws.config.update({
+    accessKeyId: AWS_KEY_ID,
+    secretAccessKey: AWS_SECRET_KEY,
+    region: "eu-central-1",
+  });
+  var s3 = new aws.S3();
+  var options = {
+    Bucket: AWS_BUCKET_NAME,
+    // Key: fileKey,
+    Key: fileKey,
+  };
+
+  // var fileStream = s3.getObject(options).createReadStream();
+  const url = s3.getSignedUrl("getObject", options);
+  return url; // ten url jest maginczy i scaiga nam plik!!!
+
+  // fileStream.pipe(res);
+}

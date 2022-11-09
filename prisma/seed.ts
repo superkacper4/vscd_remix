@@ -6,6 +6,7 @@ const prisma = new PrismaClient();
 async function seed() {
   // cleanup the existing database
   await prisma.filesOnCommits.deleteMany({});
+  await prisma.file.deleteMany({});
   await prisma.post.deleteMany({});
   await prisma.user.deleteMany({});
 
