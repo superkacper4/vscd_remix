@@ -36,7 +36,7 @@ const PostPage = ({
 }) => {
   return (
     <main className="post-bg">
-      <Nav title={post.title} />
+      <Nav title={post.title} linkTo="/posts" />
       <AddNewButton url="new" label="+ New Commit" />
 
       <div className="post-bg-wrapper">

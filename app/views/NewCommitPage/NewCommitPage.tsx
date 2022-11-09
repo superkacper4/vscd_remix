@@ -126,12 +126,12 @@ export const newCommitPageAction: ActionFunction = async ({
   await createFilesOnCommits({ commitId, filesId: mergedFilesIds }); // connect commits and files to each other
 };
 
-const NewCommitPage = () => {
+const NewCommitPage = ({ postSlug }: { postSlug: string }) => {
   const errors = useActionData();
 
   return (
     <main className="newCommit-bg">
-      <Nav title="Create Commit" />
+      <Nav title="Create Commit" linkTo={`/posts/${postSlug}`} />
       <div className="newCommit-bg-content">
         <div className="newCommit-bg-wrapper">
           <Form method="post" encType="multipart/form-data">

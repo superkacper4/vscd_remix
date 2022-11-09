@@ -16,7 +16,7 @@ export const postsPageLinks: LinksFunction = () => {
 const PostsPage = ({ posts }: LoaderData) => {
   return (
     <main className="posts-bg">
-      <Nav title="Posts" />
+      <Nav title="Posts" linkTo="/" />
       <div className="posts-bg-content">
         <AddNewButton url="new" label="+ New Post" />
         <h1 className="h1">Posts</h1>

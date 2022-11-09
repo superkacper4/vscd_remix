@@ -54,7 +54,7 @@ const NewPostPage = () => {
 
   return (
     <main className="newPost-bg">
-      <Nav title="Create Post" />
+      <Nav title="Create Post" linkTo="/posts" />
 
       <div className="newPost-bg-content">
         <div className="newPost-bg-wrapper">
