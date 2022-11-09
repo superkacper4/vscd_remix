@@ -2,7 +2,9 @@ import type { Post, File, Commit, User } from "@prisma/client";
 import { Form, Link, useActionData, useSubmit } from "@remix-run/react";
 import type { ActionFunction, LinksFunction } from "@remix-run/server-runtime";
 import { json } from "@remix-run/server-runtime";
+import { useState } from "react";
 import AddNewButton from "~/components/AddNewButton";
+import CommitSelector from "~/components/CommitSelector";
 import Nav from "~/components/Nav";
 import { downloadFileFromS3 } from "~/models/file.server";
 import styles from "./PostPage.css";
@@ -15,6 +17,8 @@ export const postPageAction: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
 
   const fileKey = formData.get("fileKey");
+
+  console.log(fileKey);
 
   const url = await downloadFileFromS3(String(fileKey));
 
@@ -34,6 +38,8 @@ const PostPage = ({
   user: User | undefined;
   commits: Commit[] | undefined;
 }) => {
+  const [downloadFilePath, setDownloadFilePath] = useState<string>("");
+
   return (
     <main className="post-bg">
       <Nav title={post.title} linkTo="/posts" />
@@ -46,35 +52,27 @@ const PostPage = ({
             <h3 className="h3">{user?.email}</h3>
             <p className="p">{commit?.message}</p>
           </div>
-          <div className="commitSelector">
-            <Form method="get">
-              {commits?.map((commit) => {
-                return (
-                  <p>
-                    <Link to={`?id=${commit.id}`} replace>
-                      {commit.id}
-                    </Link>
-                  </p>
-                );
-              })}
-            </Form>
-          </div>
+          <CommitSelector commits={commits} />
           <h2 className="h2">Files:</h2>
           <Form method="post">
+            <input name="fileKey" type="hidden" value={downloadFilePath} />
             {files?.map((file) => (
-              <>
-                <input name="fileKey" type="hidden" value={file.path} />
-
-                <button type="submit" className="fileTile" key={file.id}>
-                  <p>{file.name}</p>
-                  <p className="date">
-                    {String(file.createdAt).slice(
-                      0,
-                      String(file.createdAt).indexOf("T")
-                    )}
-                  </p>
-                </button>
-              </>
+              <button
+                type="submit"
+                className="fileTile"
+                key={file.id}
+                onClick={() => {
+                  setDownloadFilePath(file.path);
+                }}
+              >
+                <p>{file.name}</p>
+                <p className="date">
+                  {String(file.createdAt).slice(
+                    0,
+                    String(file.createdAt).indexOf("T")
+                  )}
+                </p>
+              </button>
             ))}
           </Form>
         </div>
