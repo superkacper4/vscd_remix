@@ -83,7 +83,7 @@ export const links: LinksFunction = () => {
 };
 
 export const action: ActionFunction = async ({ request, params }) => {
-  const downloadUrl = await postPageAction({ request });
+  const downloadUrl = await postPageAction({ request, params });
 
   return downloadUrl;
 };
