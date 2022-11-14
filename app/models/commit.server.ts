@@ -30,17 +30,20 @@ export async function createCommit({
   message,
   userId,
   commitId,
-}: Pick<Commit, "message"> & {
+  isTag,
+}: Pick<Commit, "message" | "isTag"> & {
   userId: User["id"];
 } & {
   postSlug: Post["slug"];
 } & {
   commitId: string;
 }) {
+  console.log("isTag", isTag);
   return prisma.commit.create({
     data: {
       id: commitId,
       message,
+      isTag,
       post: {
         connect: {
           slug: postSlug,

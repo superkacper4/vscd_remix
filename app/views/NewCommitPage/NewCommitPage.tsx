@@ -54,7 +54,7 @@ export const newCommitPageAction: ActionFunction = async ({
   let uploadHandler: UploadHandler = async ({ filename, name, data }) => {
     // handling form post method
     if (filename) {
-      //handling file when recived from post method
+      // handling file when recived from post method
       const content = await data.next().then((data) => data.value); //get file STREAM
       const filesForPrisma = {
         // prepare file format for prisma DB
@@ -68,11 +68,16 @@ export const newCommitPageAction: ActionFunction = async ({
       const createdFile = await createFile(filesForPrisma); // create files in prisma and AWS
       return JSON.stringify(createdFile);
     }
-    if ((name = "message")) {
+    if (name === "message") {
       //handling message when recived from post method
       const content = await data.next().then((data) => data.value); //get message value
       const message = String.fromCharCode.apply(null, content); // change 8bit format to string
       return message;
+    }
+
+    if (name === "isTag") {
+      //if isTag checkbox is not selected condition is unfulfilled
+      return true;
     }
   };
 
@@ -83,6 +88,7 @@ export const newCommitPageAction: ActionFunction = async ({
 
   const message = formData.get("message");
   const stringifiedFiles = formData.getAll("file");
+  const isTag = formData.get("isTag");
 
   const files = stringifiedFiles.map((file) => {
     // change each files from JSON.stringify back to objects
@@ -122,7 +128,13 @@ export const newCommitPageAction: ActionFunction = async ({
     ? mergeFiles(files, previousCommitFiles)
     : files.map((file) => file.id);
 
-  await createCommit({ postSlug, message, userId, commitId }); // create commit and s3 folder
+  await createCommit({
+    postSlug,
+    message,
+    userId,
+    commitId,
+    isTag: isTag ? Boolean(isTag) : false,
+  }); // create commit and s3 folder
   await createFilesOnCommits({ commitId, filesId: mergedFilesIds }); // connect commits and files to each other
 };
 
@@ -151,6 +163,12 @@ const NewCommitPage = ({ postSlug }: { postSlug: string }) => {
                   <em className="text-red-600">{errors.file}</em>
                 ) : null}
                 <input id="file" type="file" multiple name="file" />
+              </label>
+            </p>
+            <p>
+              <label className="newCommit-bg-checkbox">
+                <input id="isTag" type="checkbox" name="isTag" />
+                Tag
               </label>
             </p>
             <p className="text-right">

@@ -14,3 +14,11 @@
   width: 100%;
   max-width: 1000px;
 }
+
+.newCommit-bg-checkbox {
+  margin-top: var(--smallMargin);
+  display: flex;
+}
+.newCommit-bg-checkbox input {
+  width: 30px;
+}
