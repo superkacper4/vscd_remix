@@ -8,63 +8,66 @@ generator client {
 }
 
 model User {
-  id    String @id @default(cuid())
-  email String @unique
+  id            String @id @default(cuid())
+  email         String @unique
+  password      Password?
+  
+  notes         Note[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  commit        Commit[]
 
-  password Password?
-  notes    Note[]
-  post    Post[]
-  commit    Commit[]
+  createdPosts  Post[]
+  posts         PostsOnUsers[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model Password {
-  hash String
+  hash   String
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId String @unique
 }
 
 model Note {
-  id    String @id @default(cuid())
-  title String
-  body  String
+  id        String @id @default(cuid())
+  title     String
+  body      String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId String
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId    String
 }
 
 model File {
-  id   String @id @default(cuid())
-  name   String
-  path String
+  id        String @id @default(cuid())
+  name      String
+  path      String
 
-  commits FilesOnCommits[]
+  commits   FilesOnCommits[]
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Commit {
-  id       String @id @default(cuid())
-  message  String
-  isTag    Boolean
+  id        String @id @default(cuid())
+  message   String
+  isTag     Boolean
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  post     Post  @relation(fields: [postSlug], references: [slug], onDelete: Cascade, onUpdate: Cascade)
-  postSlug String
+  post      Post  @relation(fields: [postSlug], references: [slug], onDelete: Cascade, onUpdate: Cascade)
+  postSlug  String
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId   String
 
-  files FilesOnCommits[]
+  files    FilesOnCommits[]
 }
 
 model FilesOnCommits {
@@ -77,15 +80,26 @@ model FilesOnCommits {
 }
 
 model Post {
-  slug     String @id
-  title    String
-  markdown String
-  file     String
+  // id       String @id @default(cuid())
+  slug           String @id
+  title          String 
+  markdown       String
+  file           String
   
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  commits Commit[]
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId String
+  commits        Commit[]
+  users          PostsOnUsers[]
+  creatorUser    User @relation(fields: [creatorUserId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  creatorUserId  String 
+}
+
+model PostsOnUsers {
+  post         Post     @relation(fields: [postSlug], references: [slug])
+  postSlug     String 
+  user         User     @relation(fields: [userId], references: [id])
+  userId       String 
+
+  @@id([postSlug, userId])
 }

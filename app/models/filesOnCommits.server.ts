@@ -1,6 +1,3 @@
-import type { Commit, FilesOnCommits } from "@prisma/client";
-import { connect } from "http2";
-import { url } from "inspector";
 import { prisma } from "~/db.server";
 
 export async function getFilesOnCommits({ commitId }: { commitId: string }) {

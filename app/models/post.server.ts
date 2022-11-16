@@ -3,12 +3,15 @@ import { prisma } from "~/db.server";
 
 export type { Post } from "@prisma/client";
 
-export async function getPosts({ userId }: { userId: User["id"] }) {
-  return prisma.post.findMany({
-    where: { userId },
-    select: { slug: true, title: true },
-    orderBy: { updatedAt: "desc" },
-  });
+export async function getPostsByPostSlug({ postsIds }: { postsIds: string[] }) {
+  return Promise.all(
+    postsIds.map((postId) =>
+      prisma.post.findUnique({
+        where: { slug: postId },
+        select: { slug: true, title: true },
+      })
+    )
+  );
 }
 
 export async function getPost(slug: string) {
@@ -20,9 +23,9 @@ export async function createPost({
   title,
   markdown,
   file,
-  userId,
+  creatorUserId,
 }: Pick<Post, "slug" | "title" | "markdown" | "file"> & {
-  userId: User["id"];
+  creatorUserId: User["id"];
 }) {
   return prisma.post.create({
     data: {
@@ -30,9 +33,9 @@ export async function createPost({
       slug,
       file,
       markdown,
-      user: {
+      creatorUser: {
         connect: {
-          id: userId,
+          id: creatorUserId,
         },
       },
     },

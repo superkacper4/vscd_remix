@@ -5,6 +5,7 @@ import { redirect } from "@remix-run/server-runtime";
 import invariant from "tiny-invariant";
 import Nav from "~/components/Nav";
 import { createPost } from "~/models/post.server";
+import { createPostsOnUsers } from "~/models/postsOnUsers.server";
 import { requireUserId } from "~/session.server";
 import styles from "./NewPostPage.css";
 
@@ -21,7 +22,7 @@ export const newPostPageLinks: LinksFunction = () => {
 };
 
 export const newPostPageAction: ActionFunction = async ({ request }) => {
-  const userId = await requireUserId(request);
+  const creatorUserId = await requireUserId(request);
 
   const formData = await request.formData();
 
@@ -46,7 +47,8 @@ export const newPostPageAction: ActionFunction = async ({ request }) => {
   invariant(typeof markdown === "string", "markdown must be a string");
   const file = "x";
 
-  await createPost({ title, slug, markdown, file, userId });
+  await createPost({ title, slug, markdown, file, creatorUserId });
+  await createPostsOnUsers({ postSlug: slug, userId: creatorUserId });
 };
 
 const NewPostPage = () => {

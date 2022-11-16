@@ -4,7 +4,9 @@ import { Link, useLoaderData } from "@remix-run/react";
 import { addNewButtonLinks } from "~/components/AddNewButton";
 import Nav, { navLinks } from "~/components/Nav";
 import { postTileLinks } from "~/components/PostTile";
-import { getPosts } from "~/models/post.server";
+import type { getPosts } from "~/models/post.server";
+import { getPostsByPostSlug } from "~/models/post.server";
+import { getPostsOnUsers } from "~/models/postsOnUsers.server";
 import { requireUserId } from "~/session.server";
 import PostsPage, { postsPageLinks } from "~/views/Posts";
 
@@ -15,8 +17,16 @@ type LoaderData = {
 
 export const loader = async ({ request }: LoaderArgs) => {
   const userId = await requireUserId(request);
+
+  const postsOnUsers = await getPostsOnUsers({
+    userId,
+  });
+
+  const postsIds = postsOnUsers.map((post) => post.postSlug);
+  console.log(postsOnUsers);
+
   return json<LoaderData>({
-    posts: await getPosts({ userId }),
+    posts: await getPostsByPostSlug({ postsIds }),
   });
 };
 
