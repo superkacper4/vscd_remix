@@ -21,6 +21,8 @@ import { navLinks } from "~/components/Nav";
 import { buttonLinks } from "~/components/Button";
 import { getUserById } from "~/models/user.server";
 import { useEffect } from "react";
+import { checkPostAccess } from "~/models/postsOnUsers.server";
+import { requireUserId } from "~/session.server";
 
 type LoaderData = {
   post: Post;
@@ -33,7 +35,13 @@ type LoaderData = {
 };
 
 export const loader: LoaderFunction = async ({ params, request }) => {
+  const userId = await requireUserId(request);
+
   invariant(params.slug, `params.slug is required`);
+  const postSlug = params.slug;
+
+  await checkPostAccess({ userId, postSlug });
+
   const url = new URL(request.url);
 
   const post = await getPost(params.slug);
@@ -42,8 +50,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   let user;
   let commit;
   const commitId = url.searchParams.get("id");
-  const previousCommit = await getPreviousCommit({ postSlug: params.slug });
-  const commits = await getCommits({ postSlug: params.slug });
+  const previousCommit = await getPreviousCommit({ postSlug });
+  const commits = await getCommits({ postSlug });
 
   if (!commitId && previousCommit.length > 0) {
     const filesOnCommits = await getFilesOnCommits({
@@ -59,12 +67,12 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       commitId,
     });
     const filesIdArray = filesOnCommits.map((file) => file?.fileId);
-    commit = await getCommit(commitId); // this needs more protection (to only download commits from good post)
+    commit = await getCommit(commitId);
+    invariant(commit, `commit is required`);
+
     files = await getFiles({ id: filesIdArray });
     user = await getUserById(commit.userId);
   }
-
-  const postSlug = params.slug;
 
   invariant(post, `Post not found: ${postSlug}`);
   return json<LoaderData>({

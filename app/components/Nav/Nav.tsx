@@ -25,7 +25,7 @@ const Nav = ({
         position: mainPage ? "fixed" : "relative",
       }}
     >
-      {!mainPage ? <Link to={linkTo}>⬅️ Back</Link> : null}
+      {!mainPage && linkTo ? <Link to={linkTo}>⬅️ Back</Link> : null}
       <p>{title ? title : "Version System Control of Documentation"}</p>
       <div>
         {user ? (
