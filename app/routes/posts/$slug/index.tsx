@@ -31,6 +31,7 @@ type LoaderData = {
   files: File[] | undefined;
   user: User | undefined;
   commit: Commit | undefined;
+  isNewestCommit: Boolean;
 };
 
 export const loader: LoaderFunction = async ({ params, request }) => {
@@ -75,6 +76,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     user,
     commits,
     commit,
+    isNewestCommit: !commitId || commitId === previousCommit[0]?.id,
   });
 };
 
@@ -89,7 +91,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 };
 
 export default function PostSlug() {
-  const { post, files, previousCommit, user, commits, commit } =
+  const { post, files, previousCommit, user, commits, commit, isNewestCommit } =
     useLoaderData() as LoaderData;
 
   const actionData = useActionData();
@@ -111,6 +113,7 @@ export default function PostSlug() {
       commit={commit ? commit : previousCommit[0]}
       user={user}
       commits={commits}
+      isNewestCommit={isNewestCommit}
     />
   );
 }

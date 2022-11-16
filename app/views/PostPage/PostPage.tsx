@@ -16,6 +16,7 @@ import { requireUserId } from "~/session.server";
 import styles from "./PostPage.css";
 import { v4 as uuidv4 } from "uuid";
 import invariant from "tiny-invariant";
+import { createPostsOnUsers } from "~/models/postsOnUsers.server";
 
 export const postPageLinks: LinksFunction = () => {
   return [{ rel: "stylesheet", href: styles }];
@@ -26,6 +27,7 @@ export const postPageAction: ActionFunction = async ({ request, params }) => {
 
   const fileKey = formData.get("fileKey");
   const fileId = formData.get("fileId");
+  const userId = formData.get("userId");
 
   console.log(fileKey);
 
@@ -52,10 +54,21 @@ export const postPageAction: ActionFunction = async ({ request, params }) => {
     const filteredFilesIds = filteredFiles.map((file) => file.id);
     const message = `Deleted file: ${fileId}`;
 
-    await createCommit({ postSlug, message, userId, commitId }); // create commit and s3 folder
+    await createCommit({ postSlug, message, userId, commitId, isTag: false }); // create commit and s3 folder
     await createFilesOnCommits({ commitId, filesId: filteredFilesIds }); // connect commits and files to each other
 
     // const url = await downloadFileFromS3(String(fileKey));
+
+    return null;
+  } else if (userId) {
+    const postSlug = params.slug;
+
+    invariant(postSlug, "postSlug is required");
+    invariant(userId, "userId is required");
+
+    console.log(userId, postSlug);
+
+    await createPostsOnUsers({ userId: String(userId), postSlug });
 
     return null;
   } else return null;
@@ -67,12 +80,14 @@ const PostPage = ({
   commit,
   user,
   commits,
+  isNewestCommit,
 }: {
   post: Post;
   files: File[] | undefined;
   commit: Commit | undefined;
   user: User | undefined;
   commits: Commit[] | undefined;
+  isNewestCommit: Boolean;
 }) => {
   const [downloadFilePath, setDownloadFilePath] = useState<string>("");
   const [deleteFileId, setDeleteFileId] = useState<string>("");
@@ -81,6 +96,10 @@ const PostPage = ({
     <main className="post-bg">
       <Nav title={post.title} linkTo="/posts" />
       <AddNewButton url="new" label="+ New Commit" />
+      <Form method="post">
+        <input type="text" name="userId" />
+        <button type="submit">Add user</button>
+      </Form>
 
       <div className="post-bg-wrapper">
         <div className="post-bg-content">
@@ -96,14 +115,16 @@ const PostPage = ({
             <input name="fileId" type="hidden" value={deleteFileId} />
             {files?.map((file) => (
               <div key={file.id}>
-                <button
-                  type="submit"
-                  onClick={() => {
-                    setDeleteFileId(file.id);
-                  }}
-                >
-                  X
-                </button>
+                {isNewestCommit ? (
+                  <button
+                    type="submit"
+                    onClick={() => {
+                      setDeleteFileId(file.id);
+                    }}
+                  >
+                    X
+                  </button>
+                ) : null}
                 <button
                   type="submit"
                   className="fileTile"
