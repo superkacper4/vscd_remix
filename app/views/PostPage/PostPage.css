@@ -55,6 +55,6 @@
   align-items: center;
 }
 
-.fileTile .date {
+.fileTile .fileId {
   color: var(--secondaryFontColor);
 }

@@ -133,7 +133,8 @@ const PostPage = ({
                   }}
                 >
                   <p>{file.name}</p>
-                  <p className="date">
+                  <p className="fileId">{file.id}</p>
+                  <p>
                     {String(file.createdAt).slice(
                       0,
                       String(file.createdAt).indexOf("T")
