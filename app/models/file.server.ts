@@ -1,18 +1,9 @@
-import type { Commit, File } from "@prisma/client";
-import { connect } from "http2";
-import { url } from "inspector";
 import { prisma } from "~/db.server";
-import fs from "fs";
-import https from "https";
 
 import aws from "aws-sdk";
-import multer from "multer";
-import multerS3 from "multer-s3";
-import path from "path";
 
 import { S3Client } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
-import type { UploadHandler } from "@remix-run/node";
 
 const {
   AWS_BUCKET_NAME,

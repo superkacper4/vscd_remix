@@ -44,7 +44,6 @@ export const newCommitPageAction: ActionFunction = async ({
         });
         const filesIdArray = filesOnCommits?.map((file) => file?.fileId);
         files = await getFiles({ id: filesIdArray });
-        // console.log(files);
         return files;
       }
     };
@@ -64,7 +63,6 @@ export const newCommitPageAction: ActionFunction = async ({
         commitId,
         postSlug,
       };
-      // console.log(filesForPrisma);
       const createdFile = await createFile(filesForPrisma); // create files in prisma and AWS
       return JSON.stringify(createdFile);
     }

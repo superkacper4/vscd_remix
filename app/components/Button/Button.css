@@ -1,0 +1,33 @@
+.button {
+  font-size: var(--regularHeadingFontSize);
+  background-color: var(--secondColor);
+  padding: var(--smallMargin);
+  border-radius: var(--regularBorderRadius);
+  cursor: pointer;
+  /* border: 1px solid white; */
+
+  transition: background-color 0.2s;
+}
+
+.button:hover {
+  background-color: var(--firstColor);
+}
+
+.button-static {
+  padding: var(--smallMargin) var(--regularMargin);
+}
+
+.button-static:nth-of-type(2n) {
+  background-color: var(--fontColor);
+  color: var(--secondColor);
+}
+
+.button-static:nth-of-type(2n):hover {
+  background-color: var(--lighterDark);
+}
+
+.button-fixed {
+  position: fixed;
+  right: 5px;
+  top: 85px;
+}

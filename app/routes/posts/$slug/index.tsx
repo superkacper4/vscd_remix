@@ -1,12 +1,10 @@
-import { marked } from "marked";
 import type {
   ActionFunction,
   LinksFunction,
   LoaderFunction,
 } from "@remix-run/node";
-import { redirect } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { Link, useActionData, useLoaderData } from "@remix-run/react";
+import { useActionData, useLoaderData } from "@remix-run/react";
 import { getPost } from "~/models/post.server";
 import invariant from "tiny-invariant";
 
@@ -20,7 +18,7 @@ import { getFiles } from "~/models/file.server";
 import { getFilesOnCommits } from "~/models/filesOnCommits.server";
 import PostPage, { postPageAction, postPageLinks } from "~/views/PostPage";
 import { navLinks } from "~/components/Nav";
-import { addNewButtonLinks } from "~/components/AddNewButton";
+import { buttonLinks } from "~/components/Button";
 import { getUserById } from "~/models/user.server";
 import { useEffect } from "react";
 
@@ -81,7 +79,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 };
 
 export const links: LinksFunction = () => {
-  return [...postPageLinks(), ...navLinks(), ...addNewButtonLinks()];
+  return [...postPageLinks(), ...navLinks(), ...buttonLinks()];
 };
 
 export const action: ActionFunction = async ({ request, params }) => {
@@ -97,8 +95,6 @@ export default function PostSlug() {
   const actionData = useActionData();
 
   useEffect(() => {
-    console.log(actionData);
-
     if (actionData) {
       let alink = document.createElement("a");
       alink.href = actionData;

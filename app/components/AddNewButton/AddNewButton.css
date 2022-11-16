@@ -1,9 +1,0 @@
-.add-new-button {
-  font-size: var(--regularHeadingFontSize);
-  background-color: var(--secondColor);
-  padding: 5px;
-  border-radius: 0.25rem;
-  position: fixed;
-  right: 5px;
-  top: 85px;
-}

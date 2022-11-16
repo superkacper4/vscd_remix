@@ -30,8 +30,6 @@ export const newPostPageAction: ActionFunction = async ({ request }) => {
   const slug = formData.get("slug");
   const markdown = formData.get("markdown");
 
-  console.log("in newPostPageAction", title, slug, markdown);
-
   const errors: ActionData = {
     title: title ? null : "Title is required",
     slug: slug ? null : "Slug is required",

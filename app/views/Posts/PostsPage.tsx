@@ -1,12 +1,12 @@
+import type { User } from "@prisma/client";
 import type { LinksFunction } from "@remix-run/server-runtime";
-import AddNewButton from "~/components/AddNewButton";
+import Button from "~/components/Button";
 import Nav from "~/components/Nav";
 import PostTile from "~/components/PostTile";
-import type { getPosts } from "~/models/post.server";
 import styles from "./PostsPage.css";
 
 type LoaderData = {
-  posts: Awaited<ReturnType<typeof getPosts>>;
+  posts: { title: string; slug: string; creatorUser: User }[];
 };
 
 export const postsPageLinks: LinksFunction = () => {
@@ -18,10 +18,10 @@ const PostsPage = ({ posts }: LoaderData) => {
     <main className="posts-bg">
       <Nav title="Posts" linkTo="/" />
       <div className="posts-bg-content">
-        <AddNewButton url="new" label="+ New Post" />
+        <Button url="new" label="+ New Post" fixed />
         <h1 className="h1">Posts</h1>
         <div className="posts-bg-wrapper">
-          {posts.map((post) => (
+          {posts?.map((post) => (
             <PostTile
               key={post.slug}
               title={post.title}

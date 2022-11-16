@@ -38,7 +38,6 @@ export async function createCommit({
 } & {
   commitId: string;
 }) {
-  console.log("isTag", isTag);
   return prisma.commit.create({
     data: {
       id: commitId,

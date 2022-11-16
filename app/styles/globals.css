@@ -28,9 +28,10 @@
   /* z-index */
   --z5: 5;
 
-  /* border width */
+  /* border */
   --regularBorderWidth: 3px;
   --smallerBorderWidth: 2px;
+  --regularBorderRadius: 0.25rem;
 }
 
 * {

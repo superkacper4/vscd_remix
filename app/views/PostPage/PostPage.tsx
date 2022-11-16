@@ -3,7 +3,6 @@ import { Form } from "@remix-run/react";
 import type { ActionFunction, LinksFunction } from "@remix-run/server-runtime";
 import { json } from "@remix-run/server-runtime";
 import { useState } from "react";
-import AddNewButton from "~/components/AddNewButton";
 import CommitSelector from "~/components/CommitSelector";
 import Nav from "~/components/Nav";
 import { createCommit, getPreviousCommit } from "~/models/commit.server";
@@ -17,6 +16,7 @@ import styles from "./PostPage.css";
 import { v4 as uuidv4 } from "uuid";
 import invariant from "tiny-invariant";
 import { createPostsOnUsers } from "~/models/postsOnUsers.server";
+import Button from "~/components/Button";
 
 export const postPageLinks: LinksFunction = () => {
   return [{ rel: "stylesheet", href: styles }];
@@ -28,8 +28,6 @@ export const postPageAction: ActionFunction = async ({ request, params }) => {
   const fileKey = formData.get("fileKey");
   const fileId = formData.get("fileId");
   const userId = formData.get("userId");
-
-  console.log(fileKey);
 
   if (fileKey) {
     const url = await downloadFileFromS3(String(fileKey));
@@ -66,8 +64,6 @@ export const postPageAction: ActionFunction = async ({ request, params }) => {
     invariant(postSlug, "postSlug is required");
     invariant(userId, "userId is required");
 
-    console.log(userId, postSlug);
-
     await createPostsOnUsers({ userId: String(userId), postSlug });
 
     return null;
@@ -95,7 +91,7 @@ const PostPage = ({
   return (
     <main className="post-bg">
       <Nav title={post.title} linkTo="/posts" />
-      <AddNewButton url="new" label="+ New Commit" />
+      <Button url="new" label="+ New Commit" fixed />
       <Form method="post">
         <input type="text" name="userId" />
         <button type="submit">Add user</button>
