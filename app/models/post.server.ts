@@ -8,7 +8,7 @@ export async function getPostsByPostSlug({ postsIds }: { postsIds: string[] }) {
     postsIds.map((postId) =>
       prisma.post.findUnique({
         where: { slug: postId },
-        select: { slug: true, title: true },
+        select: { slug: true, title: true, creatorUser: true },
       })
     )
   );

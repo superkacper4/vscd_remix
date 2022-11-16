@@ -27,6 +27,7 @@ const PostsPage = ({ posts }: LoaderData) => {
               title={post.title}
               slug={post.slug}
               linkTo={post.slug}
+              creatorUser={post.creatorUser.email}
             />
           ))}
         </div>
