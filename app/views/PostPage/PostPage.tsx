@@ -5,13 +5,13 @@ import Nav from "~/components/Nav";
 import styles from "./PostPage.css";
 import Button from "~/components/Button";
 import FilesPage, { filesPageAction } from "./nestedPages/FilesPage";
-import CommitsPage from "./nestedPages/CommitsPage";
+import CommitsPage, { commitsPageLinks } from "./nestedPages/CommitsPage";
 import ProperitesPage, {
   propertiesPageAction,
 } from "./nestedPages/ProperitesPage";
 
 export const postPageLinks: LinksFunction = () => {
-  return [{ rel: "stylesheet", href: styles }];
+  return [{ rel: "stylesheet", href: styles }, ...commitsPageLinks()];
 };
 
 export const postPageAction: ActionFunction = async ({ request, params }) => {

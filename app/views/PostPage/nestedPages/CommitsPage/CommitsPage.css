@@ -1,0 +1,41 @@
+.commitsPage-content {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.commitsPage-content .commitTile {
+  padding: var(--smallMargin) 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  border-bottom: var(--regularBorderWidth) var(--firstColor) solid;
+  transition: background-color 0.2s;
+  margin-bottom: var(--regularMargin);
+  transition: background-color 0.2s;
+}
+
+.commitsPage-content .commitTile:hover {
+  background-color: var(--secondColor);
+}
+
+.commitsPage-content .commitTile a {
+  width: 100%;
+}
+
+.commitsPage-content .commitTile p {
+  flex: 1;
+}
+
+.commitsPage-content .commitTile .commitTileMessage {
+  text-align: center;
+}
+
+.commitsPage-content .commitTile .commitTileId {
+  text-align: center;
+  color: var(--secondaryFontColor);
+}
+
+.commitsPage-content .commitTile .commitTileContent {
+  display: flex;
+}

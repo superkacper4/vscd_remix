@@ -33,18 +33,6 @@
   flex-direction: column;
 }
 
-.post-bg-content .commitSelector {
-  min-width: 200px;
-  max-height: 500px;
-  overflow: auto;
-  display: flex;
-  flex-direction: column;
-  position: fixed;
-  left: 5px;
-  top: 85px;
-  background-color: var(--secondColor);
-}
-
 .post-bg-content .buttonBar {
   margin: var(--smallMargin) 0;
   display: flex;
@@ -61,6 +49,7 @@
 }
 
 .fileTile {
+  padding: var(--smallMargin) 0;
   width: 100%;
   padding: var(--smallMargin);
   border-bottom: var(--regularBorderWidth) var(--firstColor) solid;
@@ -68,6 +57,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  transition: background-color 0.2s;
+}
+
+.fileTile:hover {
+  background-color: var(--secondColor);
 }
 
 .fileTile .fileId {
