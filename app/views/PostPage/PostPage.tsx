@@ -46,6 +46,21 @@ const PostPage = ({
   commits: Commit[] | undefined;
   isNewestCommit: Boolean;
 }) => {
+  const [selectedPage, setSelectedPage] = useState<string>("");
+
+  const renderContent = () => {
+    switch (selectedPage) {
+      case "commits":
+        return <CommitsPage commits={commits} />;
+
+      case "properties":
+        return <ProperitesPage />;
+
+      default:
+        return <FilesPage isNewestCommit={isNewestCommit} files={files} />;
+    }
+  };
+
   return (
     <main className="post-bg">
       <Nav title={post.title} linkTo="/posts" />
@@ -58,9 +73,31 @@ const PostPage = ({
             <h3 className="h3">{user?.email}</h3>
             <p className="p">{commit?.message}</p>
           </div>
-          <FilesPage isNewestCommit={isNewestCommit} files={files} />
-          <CommitsPage commits={commits} />
-          <ProperitesPage />
+          <button
+            type="button"
+            onClick={() => {
+              setSelectedPage("");
+            }}
+          >
+            Files
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setSelectedPage("commits");
+            }}
+          >
+            Commits
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setSelectedPage("properties");
+            }}
+          >
+            Properties
+          </button>
+          {renderContent()}
         </div>
       </div>
     </main>
