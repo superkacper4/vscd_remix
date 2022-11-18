@@ -8,7 +8,7 @@ import { useActionData, useLoaderData } from "@remix-run/react";
 import { getPost } from "~/models/post.server";
 import invariant from "tiny-invariant";
 
-import type { Post, File, Commit, User } from "@prisma/client";
+import type { Post, File, Commit, User, PostsOnUsers } from "@prisma/client";
 import {
   getCommit,
   getCommits,
@@ -21,7 +21,7 @@ import { navLinks } from "~/components/Nav";
 import { buttonLinks } from "~/components/Button";
 import { getUserById } from "~/models/user.server";
 import { useEffect } from "react";
-import { checkPostAccess } from "~/models/postsOnUsers.server";
+import { checkPostAccess, getUsersOnPost } from "~/models/postsOnUsers.server";
 import { requireUserId } from "~/session.server";
 import { filesPageAction } from "~/views/PostPage/nestedPages/FilesPage";
 
@@ -33,6 +33,7 @@ type LoaderData = {
   user: User | undefined;
   commit: Commit | undefined;
   isNewestCommit: Boolean;
+  usersOnPosts: PostsOnUsers[];
 };
 
 export const loader: LoaderFunction = async ({ params, request }) => {
@@ -46,6 +47,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   const url = new URL(request.url);
 
   const post = await getPost(params.slug);
+
+  const usersOnPosts = await getUsersOnPost({ postSlug });
 
   let files;
   let user;
@@ -84,6 +87,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     commits,
     commit,
     isNewestCommit: !commitId || commitId === previousCommit[0]?.id,
+    usersOnPosts,
   });
 };
 
@@ -93,20 +97,26 @@ export const links: LinksFunction = () => {
 
 export const action: ActionFunction = async ({ request, params }) => {
   const downloadUrl = await filesPageAction({ request, params });
-  console.log("dwnURL", downloadUrl);
 
   return downloadUrl;
 };
 
 export default function PostSlug() {
-  const { post, files, previousCommit, user, commits, commit, isNewestCommit } =
-    useLoaderData() as LoaderData;
+  const {
+    post,
+    files,
+    previousCommit,
+    user,
+    commits,
+    commit,
+    isNewestCommit,
+    usersOnPosts,
+  } = useLoaderData() as LoaderData;
 
   const actionData = useActionData();
 
   useEffect(() => {
     if (actionData) {
-      console.log("actiondata", actionData);
       let alink = document.createElement("a");
       alink.href = actionData;
       alink.click();
@@ -121,6 +131,7 @@ export default function PostSlug() {
       user={user}
       commits={commits}
       isNewestCommit={isNewestCommit}
+      usersOnPosts={usersOnPosts}
     />
   );
 }

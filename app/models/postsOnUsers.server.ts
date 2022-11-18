@@ -7,6 +7,12 @@ export async function getPostsOnUsers({ userId }: { userId: User["id"] }) {
     where: { userId },
   });
 }
+
+export async function getUsersOnPost({ postSlug }: { postSlug: string }) {
+  return prisma.postsOnUsers.findMany({
+    where: { postSlug },
+  });
+}
 // migracja db i przekminić jak to dodawać nowych userów i jak wyświeltać wgl
 export async function createPostsOnUsers({
   userId,

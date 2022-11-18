@@ -1,10 +1,18 @@
 import type { Commit } from "@prisma/client";
-import CommitSelector from "~/components/CommitSelector";
+import { Link } from "@remix-run/react";
 
 const CommitsPage = ({ commits }: { commits: Commit[] | undefined }) => {
   return (
     <div>
-      <CommitSelector commits={commits} />
+      {commits?.map((commit) => {
+        return (
+          <p key={commit.id}>
+            <Link to={`?id=${commit.id}`} replace>
+              {commit.id}
+            </Link>
+          </p>
+        );
+      })}
     </div>
   );
 };

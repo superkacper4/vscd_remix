@@ -45,6 +45,21 @@
   background-color: var(--secondColor);
 }
 
+.post-bg-content .buttonBar {
+  margin: var(--smallMargin) 0;
+  display: flex;
+}
+
+.post-bg-content .buttonBar button {
+  padding: var(--smallMargin) 0;
+  flex: 1;
+  border-bottom: var(--smallerBorderWidth) solid var(--fontColor);
+}
+
+.post-bg-content .buttonBar button:hover {
+  background-color: var(--secondColor);
+}
+
 .fileTile {
   width: 100%;
   padding: var(--smallMargin);

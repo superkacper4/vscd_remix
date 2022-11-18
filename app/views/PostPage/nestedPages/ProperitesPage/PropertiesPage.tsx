@@ -1,3 +1,4 @@
+import type { Post, PostsOnUsers } from "@prisma/client";
 import { Form } from "@remix-run/react";
 import type { ActionFunction } from "@remix-run/server-runtime";
 import invariant from "tiny-invariant";
@@ -23,13 +24,30 @@ export const propertiesPageAction: ActionFunction = async ({
   } else return null;
 };
 
-const PropertiesPage = () => {
+const PropertiesPage = ({
+  post,
+  usersOnPosts,
+}: {
+  post: Post;
+  usersOnPosts: PostsOnUsers[];
+}) => {
+  console.log(usersOnPosts);
   return (
     <div>
       <Form method="post">
         <input type="text" name="userId" />
         <button type="submit">Add user</button>
       </Form>
+      <div>
+        <p>title: {post.title}</p>
+        <p>id: {post.slug}</p>
+        <p>created at: {post.createdAt}</p>
+        <p>description: {post.markdown}</p>
+        <p>contributors: </p>
+        {usersOnPosts.map((user) => (
+          <p key={user.userId}>{user.userId}</p>
+        ))}
+      </div>
     </div>
   );
 };

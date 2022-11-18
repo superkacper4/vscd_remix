@@ -1,20 +1,8 @@
-import type { Post, File, Commit, User } from "@prisma/client";
-import { Form } from "@remix-run/react";
+import type { Post, File, Commit, User, PostsOnUsers } from "@prisma/client";
 import type { ActionFunction, LinksFunction } from "@remix-run/server-runtime";
-import { json } from "@remix-run/server-runtime";
 import { useState } from "react";
-import CommitSelector from "~/components/CommitSelector";
 import Nav from "~/components/Nav";
-import { createCommit, getPreviousCommit } from "~/models/commit.server";
-import { downloadFileFromS3, getFiles } from "~/models/file.server";
-import {
-  createFilesOnCommits,
-  getFilesOnCommits,
-} from "~/models/filesOnCommits.server";
-import { requireUserId } from "~/session.server";
 import styles from "./PostPage.css";
-import invariant from "tiny-invariant";
-import { createPostsOnUsers } from "~/models/postsOnUsers.server";
 import Button from "~/components/Button";
 import FilesPage, { filesPageAction } from "./nestedPages/FilesPage";
 import CommitsPage from "./nestedPages/CommitsPage";
@@ -38,6 +26,7 @@ const PostPage = ({
   user,
   commits,
   isNewestCommit,
+  usersOnPosts,
 }: {
   post: Post;
   files: File[] | undefined;
@@ -45,8 +34,15 @@ const PostPage = ({
   user: User | undefined;
   commits: Commit[] | undefined;
   isNewestCommit: Boolean;
+  usersOnPosts: PostsOnUsers[];
 }) => {
   const [selectedPage, setSelectedPage] = useState<string>("");
+
+  const pages = [
+    { path: "", label: "Files" },
+    { path: "commits", label: "Commits" },
+    { path: "properties", label: "Properties" },
+  ];
 
   const renderContent = () => {
     switch (selectedPage) {
@@ -54,7 +50,7 @@ const PostPage = ({
         return <CommitsPage commits={commits} />;
 
       case "properties":
-        return <ProperitesPage />;
+        return <ProperitesPage post={post} usersOnPosts={usersOnPosts} />;
 
       default:
         return <FilesPage isNewestCommit={isNewestCommit} files={files} />;
@@ -73,30 +69,19 @@ const PostPage = ({
             <h3 className="h3">{user?.email}</h3>
             <p className="p">{commit?.message}</p>
           </div>
-          <button
-            type="button"
-            onClick={() => {
-              setSelectedPage("");
-            }}
-          >
-            Files
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setSelectedPage("commits");
-            }}
-          >
-            Commits
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setSelectedPage("properties");
-            }}
-          >
-            Properties
-          </button>
+          <div className="buttonBar">
+            {pages.map((page) => (
+              <button
+                key={page.path}
+                type="button"
+                onClick={() => {
+                  setSelectedPage(page.path);
+                }}
+              >
+                {page.label}
+              </button>
+            ))}
+          </div>
           {renderContent()}
         </div>
       </div>
