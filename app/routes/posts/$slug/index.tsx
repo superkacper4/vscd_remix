@@ -23,6 +23,7 @@ import { getUserById } from "~/models/user.server";
 import { useEffect } from "react";
 import { checkPostAccess } from "~/models/postsOnUsers.server";
 import { requireUserId } from "~/session.server";
+import { filesPageAction } from "~/views/PostPage/nestedPages/FilesPage";
 
 type LoaderData = {
   post: Post;
@@ -91,7 +92,8 @@ export const links: LinksFunction = () => {
 };
 
 export const action: ActionFunction = async ({ request, params }) => {
-  const downloadUrl = await postPageAction({ request, params });
+  const downloadUrl = await filesPageAction({ request, params });
+  console.log("dwnURL", downloadUrl);
 
   return downloadUrl;
 };
@@ -104,6 +106,7 @@ export default function PostSlug() {
 
   useEffect(() => {
     if (actionData) {
+      console.log("actiondata", actionData);
       let alink = document.createElement("a");
       alink.href = actionData;
       alink.click();
