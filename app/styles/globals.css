@@ -3,7 +3,7 @@
 :root {
   /* colors */
   --lighterDark: rgb(163, 163, 163);
-  --mainBgDark: rgb(98, 98, 98);
+  --mainBgDark: #403f3f;
   --firstColor: rgb(33, 148, 241);
   --secondColor: rgb(17, 91, 177);
   --navColor: rgba(20, 47, 181, 0.6);

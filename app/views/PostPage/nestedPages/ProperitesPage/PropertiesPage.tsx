@@ -34,15 +34,17 @@ const PropertiesPage = ({
   console.log(usersOnPosts);
   return (
     <div>
-      <Form method="post">
-        <input type="text" name="userId" />
-        <button type="submit">Add user</button>
-      </Form>
       <div>
         <p>title: {post.title}</p>
         <p>id: {post.slug}</p>
         <p>created at: {post.createdAt}</p>
         <p>description: {post.markdown}</p>
+
+        <h3>Add contributor</h3>
+        <Form method="post">
+          <input type="text" name="userId" />
+          <button type="submit">Add user</button>
+        </Form>
         <p>contributors: </p>
         {usersOnPosts.map((user) => (
           <p key={user.userId}>{user.userId}</p>

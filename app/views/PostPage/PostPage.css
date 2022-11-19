@@ -42,6 +42,7 @@
   padding: var(--smallMargin) 0;
   flex: 1;
   border-bottom: var(--smallerBorderWidth) solid var(--fontColor);
+  transition: background-color 0.2s;
 }
 
 .post-bg-content .buttonBar button:hover {

@@ -74,6 +74,10 @@ const PostPage = ({
               <button
                 key={page.path}
                 type="button"
+                style={{
+                  backgroundColor:
+                    selectedPage === page.path ? "var(--secondColor)" : "",
+                }}
                 onClick={() => {
                   setSelectedPage(page.path);
                 }}
