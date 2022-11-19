@@ -52,15 +52,6 @@ export const filesPageAction: ActionFunction = async ({ request, params }) => {
     // const url = await downloadFileFromS3(String(fileKey));
 
     return null;
-  } else if (userId) {
-    const postSlug = params.slug;
-
-    invariant(postSlug, "postSlug is required");
-    invariant(userId, "userId is required");
-
-    await createPostsOnUsers({ userId: String(userId), postSlug });
-
-    return null;
   } else return null;
 };
 

@@ -16,7 +16,7 @@ import {
 } from "~/models/commit.server";
 import { getFiles } from "~/models/file.server";
 import { getFilesOnCommits } from "~/models/filesOnCommits.server";
-import PostPage, { postPageAction, postPageLinks } from "~/views/PostPage";
+import PostPage, { postPageLinks } from "~/views/PostPage";
 import { navLinks } from "~/components/Nav";
 import { buttonLinks } from "~/components/Button";
 import { getUserById } from "~/models/user.server";
@@ -24,6 +24,7 @@ import { useEffect } from "react";
 import { checkPostAccess, getUsersOnPost } from "~/models/postsOnUsers.server";
 import { requireUserId } from "~/session.server";
 import { filesPageAction } from "~/views/PostPage/nestedPages/FilesPage";
+import { propertiesPageAction } from "~/views/PostPage/nestedPages/ProperitesPage";
 
 type LoaderData = {
   post: Post;
@@ -96,7 +97,11 @@ export const links: LinksFunction = () => {
 };
 
 export const action: ActionFunction = async ({ request, params }) => {
-  const downloadUrl = await filesPageAction({ request, params });
+  await propertiesPageAction({ request: request.clone(), params });
+  const downloadUrl = await filesPageAction({
+    request: request.clone(),
+    params,
+  });
 
   return downloadUrl;
 };

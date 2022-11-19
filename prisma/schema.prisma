@@ -84,15 +84,20 @@ model Post {
   slug           String @id
   title          String 
   markdown       String
-  file           String
-  
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+
+  // parent and children 
+  parentId       String?
+  parent         Post?   @relation("ParentChildren", fields: [parentId], references: [slug])
+  children       Post[]  @relation("ParentChildren")
 
   commits        Commit[]
+
   users          PostsOnUsers[]
-  creatorUser    User @relation(fields: [creatorUserId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  creatorUser    User    @relation(fields: [creatorUserId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   creatorUserId  String 
+    
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
 
 model PostsOnUsers {

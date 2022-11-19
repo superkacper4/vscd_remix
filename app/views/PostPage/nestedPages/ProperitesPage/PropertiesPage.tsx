@@ -1,7 +1,8 @@
 import type { Post, PostsOnUsers } from "@prisma/client";
-import { Form } from "@remix-run/react";
+import { Form, Link } from "@remix-run/react";
 import type { ActionFunction } from "@remix-run/server-runtime";
 import invariant from "tiny-invariant";
+import { addParent } from "~/models/post.server";
 import { createPostsOnUsers } from "~/models/postsOnUsers.server";
 
 export const propertiesPageAction: ActionFunction = async ({
@@ -11,14 +12,20 @@ export const propertiesPageAction: ActionFunction = async ({
   const formData = await request.formData();
 
   const userId = formData.get("userId");
+  const parentId = formData.get("parentId");
+  console.log("parentID", parentId);
 
-  if (userId) {
-    const postSlug = params.slug;
+  const postSlug = params.slug;
 
+  if (parentId) {
+    console.log("parentID", parentId);
+    const x = await addParent({ slug: postSlug, parentId });
+    console.log(x);
+  } else if (userId) {
     invariant(postSlug, "postSlug is required");
     invariant(userId, "userId is required");
 
-    await createPostsOnUsers({ userId: String(userId), postSlug });
+    // await createPostsOnUsers({ userId: String(userId), postSlug });
 
     return null;
   } else return null;
@@ -28,10 +35,10 @@ const PropertiesPage = ({
   post,
   usersOnPosts,
 }: {
-  post: Post;
+  post: Post & { children: Post[] };
   usersOnPosts: PostsOnUsers[];
 }) => {
-  console.log(usersOnPosts);
+  console.log(post);
   return (
     <div>
       <div>
@@ -48,6 +55,23 @@ const PropertiesPage = ({
         <p>contributors: </p>
         {usersOnPosts.map((user) => (
           <p key={user.userId}>{user.userId}</p>
+        ))}
+        <Form method="post">
+          <input type="text" name="parentId" />
+          <button type="submit">Add Parent</button>
+        </Form>
+        {post.parentId ? (
+          <>
+            <p>parent:</p>
+            <Link to={`/posts/${post.parentId}`}>{post.parentId}</Link>
+          </>
+        ) : null}
+
+        {post?.children.length > 0 ? <p>children:</p> : null}
+        {post?.children.map((child) => (
+          <Link to={`/posts/${child.slug}`} key={child.slug}>
+            {child.slug}
+          </Link>
         ))}
       </div>
     </div>

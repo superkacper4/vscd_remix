@@ -13,7 +13,6 @@ type ActionData =
   | {
       title: null | string;
       slug: null | string;
-      markdown: null | string;
     }
   | undefined;
 
@@ -33,7 +32,6 @@ export const newPostPageAction: ActionFunction = async ({ request }) => {
   const errors: ActionData = {
     title: title ? null : "Title is required",
     slug: slug ? null : "Slug is required",
-    markdown: markdown ? null : "Markdown is required",
   };
   const hasErrors = Object.values(errors).some((errorMessage) => errorMessage);
   if (hasErrors) {
@@ -43,9 +41,8 @@ export const newPostPageAction: ActionFunction = async ({ request }) => {
   invariant(typeof title === "string", "title must be a string");
   invariant(typeof slug === "string", "slug must be a string");
   invariant(typeof markdown === "string", "markdown must be a string");
-  const file = "x";
 
-  await createPost({ title, slug, markdown, file, creatorUserId });
+  await createPost({ title, slug, markdown, creatorUserId });
   await createPostsOnUsers({ postSlug: slug, userId: creatorUserId });
 };
 

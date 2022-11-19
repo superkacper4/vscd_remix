@@ -14,11 +14,6 @@ export const postPageLinks: LinksFunction = () => {
   return [{ rel: "stylesheet", href: styles }, ...commitsPageLinks()];
 };
 
-export const postPageAction: ActionFunction = async ({ request, params }) => {
-  await filesPageAction({ request, params });
-  await propertiesPageAction({ request, params });
-};
-
 const PostPage = ({
   post,
   files,

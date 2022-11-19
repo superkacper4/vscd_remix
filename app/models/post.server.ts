@@ -15,23 +15,34 @@ export async function getPostsByPostSlug({ postsIds }: { postsIds: string[] }) {
 }
 
 export async function getPost(slug: string) {
-  return prisma.post.findUnique({ where: { slug } });
+  return prisma.post.findUnique({
+    where: { slug },
+    select: {
+      slug: true,
+      title: true,
+      markdown: true,
+      parentId: true,
+      parent: true,
+      children: true,
+      commits: true,
+      creatorUserId: true,
+      createdAt: true,
+    },
+  });
 }
 
 export async function createPost({
   slug,
   title,
   markdown,
-  file,
   creatorUserId,
-}: Pick<Post, "slug" | "title" | "markdown" | "file"> & {
+}: Pick<Post, "slug" | "title" | "markdown"> & {
   creatorUserId: User["id"];
 }) {
   return prisma.post.create({
     data: {
       title,
       slug,
-      file,
       markdown,
       creatorUser: {
         connect: {
@@ -41,3 +52,22 @@ export async function createPost({
     },
   });
 }
+
+export const addParent = async ({
+  slug,
+  parentId,
+}: Pick<Post, "slug" | "parentId">) => {
+  return prisma.post.update({
+    where: {
+      slug,
+    },
+    data: {
+      // parentId,
+      parent: {
+        connect: {
+          slug: parentId,
+        },
+      },
+    },
+  });
+};
