@@ -15,7 +15,7 @@ const PostTile = ({
   title: string;
   slug: string;
   linkTo: string;
-  creatorUser: string;
+  creatorUser?: string;
 }) => {
   const length = 25;
 

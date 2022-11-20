@@ -22,6 +22,7 @@ const PostPage = ({
   commits,
   isNewestCommit,
   usersOnPosts,
+  inputErrors,
 }: {
   post: Post;
   files: File[] | undefined;
@@ -30,6 +31,10 @@ const PostPage = ({
   commits: Commit[] | undefined;
   isNewestCommit: Boolean;
   usersOnPosts: PostsOnUsers[];
+  inputErrors: {
+    parentIdError: String;
+    userIdError: String;
+  };
 }) => {
   const [selectedPage, setSelectedPage] = useState<string>("");
 
@@ -45,7 +50,13 @@ const PostPage = ({
         return <CommitsPage commits={commits} />;
 
       case "properties":
-        return <ProperitesPage post={post} usersOnPosts={usersOnPosts} />;
+        return (
+          <ProperitesPage
+            inputErrors={inputErrors}
+            post={post}
+            usersOnPosts={usersOnPosts}
+          />
+        );
 
       default:
         return <FilesPage isNewestCommit={isNewestCommit} files={files} />;

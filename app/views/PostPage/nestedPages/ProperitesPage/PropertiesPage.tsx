@@ -1,9 +1,29 @@
 import type { Post, PostsOnUsers } from "@prisma/client";
-import { Form, Link } from "@remix-run/react";
+import { Form, Link, useActionData } from "@remix-run/react";
 import type { ActionFunction } from "@remix-run/server-runtime";
+import { json } from "@remix-run/server-runtime";
 import invariant from "tiny-invariant";
+import PostTile from "~/components/PostTile";
 import { addParent } from "~/models/post.server";
-import { createPostsOnUsers } from "~/models/postsOnUsers.server";
+import {
+  createPostsOnUsers,
+  getPostsOnUsers,
+  getUsersOnPost,
+} from "~/models/postsOnUsers.server";
+import { getUserByEmail } from "~/models/user.server";
+import { requireUserId } from "~/session.server";
+
+type ActionDataUser =
+  | {
+      userId: null | string;
+    }
+  | undefined;
+
+type ActionDataParent =
+  | {
+      parentId: null | string;
+    }
+  | undefined;
 
 export const propertiesPageAction: ActionFunction = async ({
   request,
@@ -13,32 +33,79 @@ export const propertiesPageAction: ActionFunction = async ({
 
   const userId = formData.get("userId");
   const parentId = formData.get("parentId");
-  console.log("parentID", parentId);
 
   const postSlug = params.slug;
+  invariant(postSlug, "postSlug is required");
 
   if (parentId) {
-    console.log("parentID", parentId);
-    const x = await addParent({ slug: postSlug, parentId });
-    console.log(x);
+    const user = await requireUserId(request);
+
+    const postsOnUsers = await getPostsOnUsers({ userId: user });
+
+    console.log(postsOnUsers, user);
+
+    const errors: ActionDataParent = {
+      parentId: postsOnUsers.some(
+        (postOnUser) => postOnUser?.postSlug === parentId
+      )
+        ? null
+        : "Post does not exist",
+    };
+    const hasErrors = Object.values(errors).some(
+      (errorMessage) => errorMessage
+    );
+    if (hasErrors) {
+      console.log("Error " + errors.parentId);
+      return json<ActionDataParent>(errors);
+    }
+
+    await addParent({ slug: postSlug, parentId });
+
+    return "addParent";
   } else if (userId) {
-    invariant(postSlug, "postSlug is required");
     invariant(userId, "userId is required");
 
-    // await createPostsOnUsers({ userId: String(userId), postSlug });
+    const usersOnPosts = await getUsersOnPost({ postSlug });
 
-    return null;
+    const user = await getUserByEmail(String(userId));
+    console.log(user);
+
+    const generateUserIdError = () => {
+      if (usersOnPosts.some((userOnPost) => userOnPost?.userId === user?.id))
+        return "User is already added";
+      else if (!user) return "User does not exist";
+      else return null;
+    };
+
+    const errors: ActionDataUser = {
+      userId: generateUserIdError(),
+    };
+    const hasErrors = Object.values(errors).some(
+      (errorMessage) => errorMessage
+    );
+    if (hasErrors) {
+      console.log("Error " + errors.userId);
+      return json<ActionDataUser>(errors);
+    }
+
+    await createPostsOnUsers({ userId: String(user?.id), postSlug });
+
+    return "addUser";
   } else return null;
 };
 
 const PropertiesPage = ({
   post,
   usersOnPosts,
+  inputErrors,
 }: {
-  post: Post & { children: Post[] };
+  post: Post & { children: Post[]; parent: Post };
   usersOnPosts: PostsOnUsers[];
+  inputErrors: {
+    parentIdError: String;
+    userIdError: String;
+  };
 }) => {
-  console.log(post);
   return (
     <div>
       <div>
@@ -49,7 +116,10 @@ const PropertiesPage = ({
 
         <h3>Add contributor</h3>
         <Form method="post">
-          <input type="text" name="userId" />
+          {inputErrors?.userIdError ? (
+            <em className="text-red-600">{inputErrors?.userIdError}</em>
+          ) : null}
+          <input type="text" name="userId" placeholder="email@expample.com" />
           <button type="submit">Add user</button>
         </Form>
         <p>contributors: </p>
@@ -57,21 +127,31 @@ const PropertiesPage = ({
           <p key={user.userId}>{user.userId}</p>
         ))}
         <Form method="post">
-          <input type="text" name="parentId" />
+          {inputErrors?.parentIdError ? (
+            <em className="text-red-600">{inputErrors?.parentIdError}</em>
+          ) : null}
+          <input type="text" name="parentId" placeholder="Parent Slug" />
           <button type="submit">Add Parent</button>
         </Form>
         {post.parentId ? (
           <>
             <p>parent:</p>
-            <Link to={`/posts/${post.parentId}`}>{post.parentId}</Link>
+            <PostTile
+              title={post?.parent.title}
+              slug={post?.parent.slug}
+              linkTo={`posts/${post.parent.slug}`}
+            />
           </>
         ) : null}
 
         {post?.children.length > 0 ? <p>children:</p> : null}
         {post?.children.map((child) => (
-          <Link to={`/posts/${child.slug}`} key={child.slug}>
-            {child.slug}
-          </Link>
+          <PostTile
+            key={child.slug}
+            title={child.title}
+            slug={child.slug}
+            linkTo={`posts/${child.slug}`}
+          />
         ))}
       </div>
     </div>

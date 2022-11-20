@@ -25,6 +25,7 @@ import { checkPostAccess, getUsersOnPost } from "~/models/postsOnUsers.server";
 import { requireUserId } from "~/session.server";
 import { filesPageAction } from "~/views/PostPage/nestedPages/FilesPage";
 import { propertiesPageAction } from "~/views/PostPage/nestedPages/ProperitesPage";
+import { postTileLinks } from "~/components/PostTile";
 
 type LoaderData = {
   post: Post;
@@ -93,17 +94,33 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 };
 
 export const links: LinksFunction = () => {
-  return [...postPageLinks(), ...navLinks(), ...buttonLinks()];
+  return [
+    ...postPageLinks(),
+    ...navLinks(),
+    ...buttonLinks(),
+    ...postTileLinks(),
+  ];
 };
 
 export const action: ActionFunction = async ({ request, params }) => {
-  await propertiesPageAction({ request: request.clone(), params });
+  const properitesAction = await propertiesPageAction({
+    request: request.clone(),
+    params,
+  });
+  console.log(properitesAction);
+  if (properitesAction) {
+    return properitesAction;
+  }
+
   const downloadUrl = await filesPageAction({
     request: request.clone(),
     params,
   });
+  if (downloadUrl) {
+    return downloadUrl;
+  }
 
-  return downloadUrl;
+  return null;
 };
 
 export default function PostSlug() {
@@ -120,13 +137,15 @@ export default function PostSlug() {
 
   const actionData = useActionData();
 
+  console.log(actionData);
+
   useEffect(() => {
-    if (actionData) {
+    if (actionData?.url) {
       let alink = document.createElement("a");
-      alink.href = actionData;
+      alink.href = actionData.url;
       alink.click();
     }
-  }, [actionData]);
+  }, [actionData?.url]);
 
   return (
     <PostPage
@@ -137,6 +156,10 @@ export default function PostSlug() {
       commits={commits}
       isNewestCommit={isNewestCommit}
       usersOnPosts={usersOnPosts}
+      inputErrors={{
+        parentIdError: actionData?.parentId,
+        userIdError: actionData?.userId,
+      }}
     />
   );
 }

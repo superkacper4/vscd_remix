@@ -26,7 +26,7 @@ export const filesPageAction: ActionFunction = async ({ request, params }) => {
     console.log("filekey", fileKey);
     const url = await downloadFileFromS3(String(fileKey));
 
-    return json(url);
+    return json({ url });
   } else if (fileId) {
     invariant(params.slug, `params.slug is required`);
 
