@@ -30,7 +30,7 @@ const PostPage = ({
   user: User | undefined;
   commits: Commit[] | undefined;
   isNewestCommit: Boolean;
-  usersOnPosts: PostsOnUsers[];
+  usersOnPosts: User[];
   inputErrors: {
     parentIdError: String;
     userIdError: String;

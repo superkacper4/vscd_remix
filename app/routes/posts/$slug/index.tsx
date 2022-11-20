@@ -19,7 +19,7 @@ import { getFilesOnCommits } from "~/models/filesOnCommits.server";
 import PostPage, { postPageLinks } from "~/views/PostPage";
 import { navLinks } from "~/components/Nav";
 import { buttonLinks } from "~/components/Button";
-import { getUserById } from "~/models/user.server";
+import { getManyUsersById, getUserById } from "~/models/user.server";
 import { useEffect } from "react";
 import { checkPostAccess, getUsersOnPost } from "~/models/postsOnUsers.server";
 import { requireUserId } from "~/session.server";
@@ -35,7 +35,7 @@ type LoaderData = {
   user: User | undefined;
   commit: Commit | undefined;
   isNewestCommit: Boolean;
-  usersOnPosts: PostsOnUsers[];
+  usersOnPosts: User[];
 };
 
 export const loader: LoaderFunction = async ({ params, request }) => {
@@ -50,7 +50,9 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
   const post = await getPost(params.slug);
 
-  const usersOnPosts = await getUsersOnPost({ postSlug });
+  const usersIdsOnPosts = await getUsersOnPost({ postSlug });
+  const usersIds = usersIdsOnPosts?.map((userId) => userId.userId);
+  const usersOnPosts = await getManyUsersById(usersIds);
 
   let files;
   let user;

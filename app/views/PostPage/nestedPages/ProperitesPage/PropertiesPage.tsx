@@ -1,4 +1,4 @@
-import type { Post, PostsOnUsers } from "@prisma/client";
+import type { Post, PostsOnUsers, User } from "@prisma/client";
 import { Form, Link, useActionData } from "@remix-run/react";
 import type { ActionFunction } from "@remix-run/server-runtime";
 import { json } from "@remix-run/server-runtime";
@@ -100,7 +100,7 @@ const PropertiesPage = ({
   inputErrors,
 }: {
   post: Post & { children: Post[]; parent: Post };
-  usersOnPosts: PostsOnUsers[];
+  usersOnPosts: User[];
   inputErrors: {
     parentIdError: String;
     userIdError: String;
@@ -111,8 +111,12 @@ const PropertiesPage = ({
       <div>
         <p>title: {post.title}</p>
         <p>id: {post.slug}</p>
-        <p>created at: {post.createdAt}</p>
-        <p>description: {post.markdown}</p>
+
+        <p>
+          created at:{" "}
+          {String(post.createdAt).slice(0, String(post.createdAt).indexOf("T"))}
+        </p>
+        {post.markdown ? <p>markdown: {post.markdown}</p> : null}
 
         <h3>Add contributor</h3>
         <Form method="post">
@@ -124,7 +128,7 @@ const PropertiesPage = ({
         </Form>
         <p>contributors: </p>
         {usersOnPosts.map((user) => (
-          <p key={user.userId}>{user.userId}</p>
+          <p key={user.id}>{user.email}</p>
         ))}
         <Form method="post">
           {inputErrors?.parentIdError ? (
@@ -139,7 +143,7 @@ const PropertiesPage = ({
             <PostTile
               title={post?.parent.title}
               slug={post?.parent.slug}
-              linkTo={`posts/${post.parent.slug}`}
+              linkTo={`/posts/${post.parent.slug}`}
             />
           </>
         ) : null}
@@ -150,7 +154,7 @@ const PropertiesPage = ({
             key={child.slug}
             title={child.title}
             slug={child.slug}
-            linkTo={`posts/${child.slug}`}
+            linkTo={`/posts/${child.slug}`}
           />
         ))}
       </div>
