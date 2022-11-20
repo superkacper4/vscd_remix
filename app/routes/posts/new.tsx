@@ -1,5 +1,6 @@
 import type { ActionFunction, LinksFunction } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
+import { useActionData } from "@remix-run/react";
 import { navLinks } from "~/components/Nav";
 import NewPostPage, {
   newPostPageAction,
@@ -11,11 +12,14 @@ export const links: LinksFunction = () => {
 };
 
 export const action: ActionFunction = async ({ request }) => {
-  await newPostPageAction({ request });
+  const newPostPageError = await newPostPageAction({ request });
 
-  return redirect("/posts");
+  if (newPostPageError) return newPostPageError;
+  else return redirect("/posts");
 };
 
 export default function NewPost() {
-  return <NewPostPage />;
+  const errors = useActionData();
+
+  return <NewPostPage errors={errors} />;
 }

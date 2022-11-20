@@ -46,9 +46,7 @@ export const newPostPageAction: ActionFunction = async ({ request }) => {
   await createPostsOnUsers({ postSlug: slug, userId: creatorUserId });
 };
 
-const NewPostPage = () => {
-  const errors = useActionData();
-
+const NewPostPage = ({ errors }: { errors: ActionData }) => {
   return (
     <main className="newPost-bg">
       <Nav title="Create Post" linkTo="/posts" />
@@ -75,12 +73,7 @@ const NewPostPage = () => {
               </label>
             </p>
             <p>
-              <label htmlFor="markdown">
-                Markdown:
-                {errors?.markdown ? (
-                  <em className="text-red-600">{errors.markdown}</em>
-                ) : null}
-              </label>
+              <label htmlFor="markdown">Markdown:</label>
               <br />
               <textarea id="markdown" rows={20} name="markdown" />
             </p>
