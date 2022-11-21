@@ -11,6 +11,13 @@ export async function getCommits({ postSlug }: Pick<Commit, "postSlug">) {
   });
 }
 
+export async function getCommitsIds({ postSlug }: Pick<Commit, "postSlug">) {
+  return prisma.commit.findMany({
+    where: { postSlug },
+    select: { id: true },
+  });
+}
+
 export async function getCommit(id: string) {
   return prisma.commit.findUnique({ where: { id } });
 }
@@ -56,3 +63,13 @@ export async function createCommit({
     },
   });
 }
+
+export const deleteAllCommits = async ({ slug }: { slug: string }) => {
+  await prisma.commit.deleteMany({
+    where: {
+      postSlug: {
+        contains: slug,
+      },
+    },
+  });
+};

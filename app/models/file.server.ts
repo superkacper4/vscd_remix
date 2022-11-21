@@ -57,7 +57,6 @@ const storage = new S3Client({
 });
 
 export async function uploadStreamToSpaces(stream: string, filename: string) {
-  console.log("uploadStream");
   return new Upload({
     client: storage,
     leavePartsOnError: false,
@@ -106,3 +105,18 @@ export async function downloadFileFromS3(fileKey: string) {
 
   // fileStream.pipe(res);
 }
+
+export const deleteFilesFromS3 = ({ postSlug }: { postSlug: string }) => {
+  console.log("create empty object", postSlug);
+  const key = `${postSlug}/`;
+  // fix me - doesnt delete files
+  new aws.S3().putObject(
+    {
+      Key: key, // This should create an empty object in which we can store files
+      Bucket: `${AWS_BUCKET_NAME}`,
+    },
+    (err, data) => {
+      console.log(err, data);
+    }
+  );
+};

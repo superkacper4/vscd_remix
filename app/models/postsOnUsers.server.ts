@@ -41,3 +41,13 @@ export async function checkPostAccess({
   if (!postsOnUsers.some((post) => post.postSlug === postSlug))
     throw redirect(`/posts`);
 }
+
+export const deletePostOnUsers = async ({ slug }: { slug: string }) => {
+  await prisma.postsOnUsers.deleteMany({
+    where: {
+      postSlug: {
+        contains: slug,
+      },
+    },
+  });
+};

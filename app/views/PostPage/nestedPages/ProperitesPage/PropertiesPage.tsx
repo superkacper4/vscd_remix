@@ -4,9 +4,13 @@ import type { ActionFunction } from "@remix-run/server-runtime";
 import { json } from "@remix-run/server-runtime";
 import invariant from "tiny-invariant";
 import PostTile from "~/components/PostTile";
-import { addParent } from "~/models/post.server";
+import { deleteAllCommits, getCommitsIds } from "~/models/commit.server";
+import { deleteFilesFromS3 } from "~/models/file.server";
+import { deleteFilesOnCommits } from "~/models/filesOnCommits.server";
+import { addParent, deletePost } from "~/models/post.server";
 import {
   createPostsOnUsers,
+  deletePostOnUsers,
   getPostsOnUsers,
   getUsersOnPost,
 } from "~/models/postsOnUsers.server";
@@ -33,11 +37,19 @@ export const propertiesPageAction: ActionFunction = async ({
 
   const userId = formData.get("userId");
   const parentId = formData.get("parentId");
+  const confirmDelete = formData.get("confirmDelete");
 
   const postSlug = params.slug;
   invariant(postSlug, "postSlug is required");
 
-  if (parentId) {
+  if (confirmDelete) {
+    await deletePostOnUsers({ slug: postSlug });
+    const commitsIds = await getCommitsIds({ postSlug });
+    const commitsIdsArray = commitsIds.map((commitId) => commitId.id);
+    deleteFilesOnCommits({ commitsIds: commitsIdsArray });
+    await deletePost({ slug: postSlug });
+    // deleteFilesFromS3({ postSlug });
+  } else if (parentId) {
     const user = await requireUserId(request);
 
     const postsOnUsers = await getPostsOnUsers({ userId: user });
@@ -157,6 +169,13 @@ const PropertiesPage = ({
             linkTo={`/posts/${child.slug}`}
           />
         ))}
+        <Form method="post">
+          {/* {inputErrors?.parentIdError ? (
+            <em className="text-red-600">{inputErrors?.parentIdError}</em>
+          ) : null} */}
+          <input type="text" name="confirmDelete" placeholder="Parent Slug" />
+          <button type="submit">Add Parent</button>
+        </Form>
       </div>
     </div>
   );

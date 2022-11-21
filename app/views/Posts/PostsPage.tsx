@@ -3,6 +3,7 @@ import type { LinksFunction } from "@remix-run/server-runtime";
 import Button from "~/components/Button";
 import Nav from "~/components/Nav";
 import PostTile from "~/components/PostTile";
+import { deleteFilesFromS3 } from "~/models/file.server";
 import styles from "./PostsPage.css";
 
 type LoaderData = {
@@ -31,6 +32,12 @@ const PostsPage = ({ posts }: LoaderData) => {
             />
           ))}
         </div>
+        <button
+          type="button"
+          onClick={() => deleteFilesFromS3({ postSlug: "piste" })}
+        >
+          xd
+        </button>
       </div>
     </main>
   );

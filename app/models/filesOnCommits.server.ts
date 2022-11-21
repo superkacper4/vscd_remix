@@ -22,3 +22,17 @@ export async function createFilesOnCommits({
     })),
   });
 }
+
+export const deleteFilesOnCommits = async ({
+  commitsIds,
+}: {
+  commitsIds: string[];
+}) => {
+  await prisma.filesOnCommits.deleteMany({
+    where: {
+      commitId: {
+        in: commitsIds,
+      },
+    },
+  });
+};

@@ -71,3 +71,12 @@ export const addParent = async ({
     },
   });
 };
+
+export const deletePost = async ({ slug }: { slug: string }) => {
+  return await prisma.post.delete({
+    where: {
+      slug,
+    },
+    include: { commits: true },
+  });
+};
