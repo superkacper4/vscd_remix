@@ -22,24 +22,24 @@ export const links: LinksFunction = () => {
 export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await requireUserId(request);
 
-  invariant(params.slug, `params.slug is required`);
-  const postSlug = params.slug;
+  invariant(params.id, `params.id is required`);
+  const postId = params.id;
 
-  await checkPostAccess({ userId, postSlug });
+  await checkPostAccess({ userId, postId });
 
   return json({
-    postSlug,
+    postId,
   });
 };
 
 export const action: ActionFunction = async ({ request, params }) => {
   await newCommitPageAction({ request, params });
-  const postSlug = params.slug;
+  const postId = params.id;
 
-  return redirect(`/posts/${postSlug}`);
+  return redirect(`/posts/${postId}`);
 };
 
 export default function NewPost() {
-  const { postSlug } = useLoaderData();
-  return <NewCommitPage postSlug={postSlug} />;
+  const { postId } = useLoaderData();
+  return <NewCommitPage postId={postId} />;
 }

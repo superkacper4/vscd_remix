@@ -5,13 +5,13 @@ import { useLoaderData } from "@remix-run/react";
 import { buttonLinks } from "~/components/Button";
 import { navLinks } from "~/components/Nav";
 import { postTileLinks } from "~/components/PostTile";
-import { getPostsByPostSlug } from "~/models/post.server";
+import { getPostsByPostId } from "~/models/post.server";
 import { getPostsOnUsers } from "~/models/postsOnUsers.server";
 import { requireUserId } from "~/session.server";
 import PostsPage, { postsPageLinks } from "~/views/Posts";
 
 type LoaderData = {
-  posts: ({ title: string; slug: string; creatorUser: User } | null)[];
+  posts: ({ title: string; id: string; creatorUser: User } | null)[];
 };
 
 export const loader = async ({ request }: LoaderArgs) => {
@@ -21,10 +21,10 @@ export const loader = async ({ request }: LoaderArgs) => {
     userId,
   });
 
-  const postsIds = postsOnUsers.map((post) => post.postSlug);
+  const postsIds = postsOnUsers.map((post) => post.postId);
 
   return json<LoaderData>({
-    posts: await getPostsByPostSlug({ postsIds }),
+    posts: await getPostsByPostId({ postsIds }),
   });
 };
 

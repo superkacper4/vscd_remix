@@ -8,29 +8,20 @@ export const postTileLinks: LinksFunction = () => {
 
 const PostTile = ({
   title,
-  slug,
+  id,
   linkTo,
   creatorUser,
 }: {
   title: string;
-  slug: string;
+  id: string;
   linkTo: string;
   creatorUser?: string;
 }) => {
-  const length = 25;
-
-  const generateSubTitle = () => {
-    if (slug.length >= length) {
-      return slug.substring(0, length).concat("...");
-    }
-    return slug;
-  };
-
   return (
     <div className="postTile">
       <Link to={linkTo}>
         <h3 className="h2">{title}</h3>
-        <p className="p">{generateSubTitle()}</p>
+        <p className="p">{id}</p>
         <p className="p">{creatorUser}</p>
       </Link>
     </div>

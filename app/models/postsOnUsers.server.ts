@@ -8,22 +8,22 @@ export async function getPostsOnUsers({ userId }: { userId: User["id"] }) {
   });
 }
 
-export async function getUsersOnPost({ postSlug }: { postSlug: string }) {
+export async function getUsersOnPost({ postId }: { postId: string }) {
   return prisma.postsOnUsers.findMany({
-    where: { postSlug },
+    where: { postId },
   });
 }
 // migracja db i przekminić jak to dodawać nowych userów i jak wyświeltać wgl
 export async function createPostsOnUsers({
   userId,
-  postSlug,
+  postId,
 }: {
   userId: string;
-  postSlug: string;
+  postId: string;
 }) {
   return prisma.postsOnUsers.create({
     data: {
-      postSlug,
+      postId,
       userId,
     },
   });
@@ -31,22 +31,22 @@ export async function createPostsOnUsers({
 
 export async function checkPostAccess({
   userId,
-  postSlug,
+  postId,
 }: {
   userId: string;
-  postSlug: string;
+  postId: string;
 }) {
   const postsOnUsers = await getPostsOnUsers({ userId });
 
-  if (!postsOnUsers.some((post) => post.postSlug === postSlug))
+  if (!postsOnUsers.some((post) => post.postId === postId))
     throw redirect(`/posts`);
 }
 
-export const deletePostOnUsers = async ({ slug }: { slug: string }) => {
+export const deletePostOnUsers = async ({ id }: { id: string }) => {
   await prisma.postsOnUsers.deleteMany({
     where: {
-      postSlug: {
-        contains: slug,
+      postId: {
+        contains: id,
       },
     },
   });

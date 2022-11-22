@@ -3,22 +3,22 @@ import { prisma } from "~/db.server";
 
 export type { Post } from "@prisma/client";
 
-export async function getPostsByPostSlug({ postsIds }: { postsIds: string[] }) {
+export async function getPostsByPostId({ postsIds }: { postsIds: string[] }) {
   return Promise.all(
     postsIds.map((postId) =>
       prisma.post.findUnique({
-        where: { slug: postId },
-        select: { slug: true, title: true, creatorUser: true },
+        where: { id: postId },
+        select: { id: true, title: true, creatorUser: true },
       })
     )
   );
 }
 
-export async function getPost(slug: string) {
+export async function getPost(id: string) {
   return prisma.post.findUnique({
-    where: { slug },
+    where: { id },
     select: {
-      slug: true,
+      id: true,
       title: true,
       markdown: true,
       parentId: true,
@@ -32,17 +32,17 @@ export async function getPost(slug: string) {
 }
 
 export async function createPost({
-  slug,
+  id,
   title,
   markdown,
   creatorUserId,
-}: Pick<Post, "slug" | "title" | "markdown"> & {
+}: Pick<Post, "id" | "title" | "markdown"> & {
   creatorUserId: User["id"];
 }) {
   return prisma.post.create({
     data: {
       title,
-      slug,
+      id,
       markdown,
       creatorUser: {
         connect: {
@@ -54,28 +54,28 @@ export async function createPost({
 }
 
 export const addParent = async ({
-  slug,
+  id,
   parentId,
-}: Pick<Post, "slug" | "parentId">) => {
+}: Pick<Post, "id" | "parentId">) => {
   return prisma.post.update({
     where: {
-      slug,
+      id,
     },
     data: {
       // parentId,
       parent: {
         connect: {
-          slug: parentId,
+          id: parentId,
         },
       },
     },
   });
 };
 
-export const deletePost = async ({ slug }: { slug: string }) => {
+export const deletePost = async ({ id }: { id: string }) => {
   return await prisma.post.delete({
     where: {
-      slug,
+      id,
     },
     include: { commits: true },
   });

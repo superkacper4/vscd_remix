@@ -41,16 +41,16 @@ type LoaderData = {
 export const loader: LoaderFunction = async ({ params, request }) => {
   const userId = await requireUserId(request);
 
-  invariant(params.slug, `params.slug is required`);
-  const postSlug = params.slug;
+  invariant(params.id, `params.id is required`);
+  const postId = params.id;
 
-  await checkPostAccess({ userId, postSlug });
+  await checkPostAccess({ userId, postId });
 
   const url = new URL(request.url);
 
-  const post = await getPost(params.slug);
+  const post = await getPost(postId);
 
-  const usersIdsOnPosts = await getUsersOnPost({ postSlug });
+  const usersIdsOnPosts = await getUsersOnPost({ postId });
   const usersIds = usersIdsOnPosts?.map((userId) => userId.userId);
   const usersOnPosts = await getManyUsersById(usersIds);
 
@@ -58,8 +58,8 @@ export const loader: LoaderFunction = async ({ params, request }) => {
   let user;
   let commit;
   const commitId = url.searchParams.get("id");
-  const previousCommit = await getPreviousCommit({ postSlug });
-  const commits = await getCommits({ postSlug });
+  const previousCommit = await getPreviousCommit({ postId });
+  const commits = await getCommits({ postId });
 
   if (!commitId && previousCommit.length > 0) {
     const filesOnCommits = await getFilesOnCommits({
@@ -82,7 +82,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     user = await getUserById(commit.userId);
   }
 
-  invariant(post, `Post not found: ${postSlug}`);
+  invariant(post, `Post not found: ${postId}`);
   return json<LoaderData>({
     post,
     files,
@@ -125,7 +125,7 @@ export const action: ActionFunction = async ({ request, params }) => {
   return null;
 };
 
-export default function PostSlug() {
+export default function PostId() {
   const {
     post,
     files,

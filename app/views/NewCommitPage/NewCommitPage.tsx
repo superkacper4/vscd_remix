@@ -28,14 +28,14 @@ export const newCommitPageAction: ActionFunction = async ({
   const userId = await requireUserId(request); // get user creating commit
   const commitId = uuidv4(); // genereate commit id
 
-  invariant(params.slug, `params.slug is required`);
+  invariant(params.id, `params.id is required`);
 
-  const postSlug = params.slug;
+  const postId = params.id;
 
   const generatePreviousCommitFiles = async () => {
     // defining clouseres to save prevoius commit files without global variable
     let files = [];
-    const previousCommit = await getPreviousCommit({ postSlug });
+    const previousCommit = await getPreviousCommit({ postId });
 
     const innerGeneratePreviousCommitFiles = async () => {
       if (previousCommit.length > 0) {
@@ -61,7 +61,7 @@ export const newCommitPageAction: ActionFunction = async ({
         id: uuidv4(),
         content,
         commitId,
-        postSlug,
+        postId,
       };
       const createdFile = await createFile(filesForPrisma); // create files in prisma and AWS
       return JSON.stringify(createdFile);
@@ -127,7 +127,7 @@ export const newCommitPageAction: ActionFunction = async ({
     : files.map((file) => file.id);
 
   await createCommit({
-    postSlug,
+    postId,
     message,
     userId,
     commitId,
@@ -136,12 +136,12 @@ export const newCommitPageAction: ActionFunction = async ({
   await createFilesOnCommits({ commitId, filesId: mergedFilesIds }); // connect commits and files to each other
 };
 
-const NewCommitPage = ({ postSlug }: { postSlug: string }) => {
+const NewCommitPage = ({ postId }: { postId: string }) => {
   const errors = useActionData();
 
   return (
     <main className="newCommit-bg">
-      <Nav title="Create Commit" linkTo={`/posts/${postSlug}`} />
+      <Nav title="Create Commit" linkTo={`/posts/${postId}`} />
       <div className="newCommit-bg-content">
         <div className="newCommit-bg-wrapper">
           <Form method="post" encType="multipart/form-data">

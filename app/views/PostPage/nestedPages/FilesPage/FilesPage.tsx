@@ -28,12 +28,12 @@ export const filesPageAction: ActionFunction = async ({ request, params }) => {
 
     return json({ url });
   } else if (fileId) {
-    invariant(params.slug, `params.slug is required`);
+    invariant(params.id, `params.id is required`);
 
-    const postSlug = params.slug;
+    const postId = params.id;
     const userId = await requireUserId(request); // get user creating commit
     const commitId = uuidv4(); // genereate commit id
-    const previousCommit = await getPreviousCommit({ postSlug });
+    const previousCommit = await getPreviousCommit({ postId });
 
     const filesOnCommits = await getFilesOnCommits({
       commitId: previousCommit[0]?.id,
@@ -46,7 +46,7 @@ export const filesPageAction: ActionFunction = async ({ request, params }) => {
     const filteredFilesIds = filteredFiles.map((file) => file.id);
     const message = `Deleted file: ${fileId}`;
 
-    await createCommit({ postSlug, message, userId, commitId, isTag: false }); // create commit and s3 folder
+    await createCommit({ postId, message, userId, commitId, isTag: false }); // create commit and s3 folder
     await createFilesOnCommits({ commitId, filesId: filteredFilesIds }); // connect commits and files to each other
 
     // const url = await downloadFileFromS3(String(fileKey));

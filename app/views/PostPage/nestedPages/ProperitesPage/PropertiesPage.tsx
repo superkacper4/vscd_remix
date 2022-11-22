@@ -39,16 +39,16 @@ export const propertiesPageAction: ActionFunction = async ({
   const parentId = formData.get("parentId");
   const confirmDelete = formData.get("confirmDelete");
 
-  const postSlug = params.slug;
-  invariant(postSlug, "postSlug is required");
+  const postId = params.id;
+  invariant(postId, "post.id is required");
 
   if (confirmDelete === "delete") {
-    await deletePostOnUsers({ slug: postSlug });
-    const commitsIds = await getCommitsIds({ postSlug });
+    await deletePostOnUsers({ id: postId });
+    const commitsIds = await getCommitsIds({ postId });
     const commitsIdsArray = commitsIds.map((commitId) => commitId.id);
     deleteFilesOnCommits({ commitsIds: commitsIdsArray });
-    await deletePost({ slug: postSlug });
-    deleteFilesFromS3({ postSlug });
+    await deletePost({ id: postId });
+    deleteFilesFromS3({ postId });
   } else if (parentId) {
     const user = await requireUserId(request);
 
@@ -58,7 +58,7 @@ export const propertiesPageAction: ActionFunction = async ({
 
     const errors: ActionDataParent = {
       parentId: postsOnUsers.some(
-        (postOnUser) => postOnUser?.postSlug === parentId
+        (postOnUser) => postOnUser?.postId === parentId
       )
         ? null
         : "Post does not exist",
@@ -71,13 +71,13 @@ export const propertiesPageAction: ActionFunction = async ({
       return json<ActionDataParent>(errors);
     }
 
-    await addParent({ slug: postSlug, parentId });
+    await addParent({ id: postId, parentId });
 
     return "addParent";
   } else if (userId) {
     invariant(userId, "userId is required");
 
-    const usersOnPosts = await getUsersOnPost({ postSlug });
+    const usersOnPosts = await getUsersOnPost({ postId });
 
     const user = await getUserByEmail(String(userId));
     console.log(user);
@@ -100,7 +100,7 @@ export const propertiesPageAction: ActionFunction = async ({
       return json<ActionDataUser>(errors);
     }
 
-    await createPostsOnUsers({ userId: String(user?.id), postSlug });
+    await createPostsOnUsers({ userId: String(user?.id), postId });
 
     return "addUser";
   } else return null;
@@ -122,7 +122,7 @@ const PropertiesPage = ({
     <div>
       <div>
         <p>title: {post.title}</p>
-        <p>id: {post.slug}</p>
+        <p>id: {post.id}</p>
 
         <p>
           created at:{" "}
@@ -147,7 +147,7 @@ const PropertiesPage = ({
           {inputErrors?.parentIdError ? (
             <em className="text-red-600">{inputErrors?.parentIdError}</em>
           ) : null}
-          <input type="text" name="parentId" placeholder="Parent Slug" />
+          <input type="text" name="parentId" placeholder="Parent Id" />
           <button type="submit">Add Parent</button>
         </Form>
         {post.parentId ? (
@@ -155,8 +155,8 @@ const PropertiesPage = ({
             <p>parent:</p>
             <PostTile
               title={post?.parent.title}
-              slug={post?.parent.slug}
-              linkTo={`/posts/${post.parent.slug}`}
+              id={post?.parent.id}
+              linkTo={`/posts/${post.parent.id}`}
             />
           </>
         ) : null}
@@ -164,10 +164,10 @@ const PropertiesPage = ({
         {post?.children.length > 0 ? <p>children:</p> : null}
         {post?.children.map((child) => (
           <PostTile
-            key={child.slug}
+            key={child.id}
             title={child.title}
-            slug={child.slug}
-            linkTo={`/posts/${child.slug}`}
+            id={child.id}
+            linkTo={`/posts/${child.id}`}
           />
         ))}
         <h3>Delete Post</h3>

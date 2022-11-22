@@ -8,11 +8,11 @@ import { createPost } from "~/models/post.server";
 import { createPostsOnUsers } from "~/models/postsOnUsers.server";
 import { requireUserId } from "~/session.server";
 import styles from "./NewPostPage.css";
+import { v4 as uuidv4 } from "uuid";
 
 type ActionData =
   | {
       title: null | string;
-      slug: null | string;
     }
   | undefined;
 
@@ -22,16 +22,15 @@ export const newPostPageLinks: LinksFunction = () => {
 
 export const newPostPageAction: ActionFunction = async ({ request }) => {
   const creatorUserId = await requireUserId(request);
+  const postId = uuidv4();
 
   const formData = await request.formData();
 
   const title = formData.get("title");
-  const slug = formData.get("slug");
   const markdown = formData.get("markdown");
 
   const errors: ActionData = {
     title: title ? null : "Title is required",
-    slug: slug ? null : "Slug is required",
   };
   const hasErrors = Object.values(errors).some((errorMessage) => errorMessage);
   if (hasErrors) {
@@ -39,11 +38,10 @@ export const newPostPageAction: ActionFunction = async ({ request }) => {
   }
 
   invariant(typeof title === "string", "title must be a string");
-  invariant(typeof slug === "string", "slug must be a string");
   invariant(typeof markdown === "string", "markdown must be a string");
 
-  await createPost({ title, slug, markdown, creatorUserId });
-  await createPostsOnUsers({ postSlug: slug, userId: creatorUserId });
+  await createPost({ title, id: postId, markdown, creatorUserId });
+  await createPostsOnUsers({ postId, userId: creatorUserId });
 };
 
 const NewPostPage = ({ errors }: { errors: ActionData }) => {
@@ -61,15 +59,6 @@ const NewPostPage = ({ errors }: { errors: ActionData }) => {
                   <em className="text-red-600">{errors.title}</em>
                 ) : null}
                 <input type="text" name="title" />
-              </label>
-            </p>
-            <p>
-              <label>
-                Post Slug:{" "}
-                {errors?.slug ? (
-                  <em className="text-red-600">{errors.slug}</em>
-                ) : null}
-                <input type="text" name="slug" />
               </label>
             </p>
             <p>

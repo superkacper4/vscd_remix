@@ -3,17 +3,17 @@ import { prisma } from "~/db.server";
 
 export type { Post } from "@prisma/client";
 
-export async function getCommits({ postSlug }: Pick<Commit, "postSlug">) {
+export async function getCommits({ postId }: Pick<Commit, "postId">) {
   return prisma.commit.findMany({
-    where: { postSlug },
+    where: { postId },
     // select: { message: true, id: true },
     orderBy: { updatedAt: "desc" },
   });
 }
 
-export async function getCommitsIds({ postSlug }: Pick<Commit, "postSlug">) {
+export async function getCommitsIds({ postId }: Pick<Commit, "postId">) {
   return prisma.commit.findMany({
-    where: { postSlug },
+    where: { postId },
     select: { id: true },
   });
 }
@@ -22,18 +22,16 @@ export async function getCommit(id: string) {
   return prisma.commit.findUnique({ where: { id } });
 }
 
-export const getPreviousCommit = async ({
-  postSlug,
-}: Pick<Commit, "postSlug">) => {
+export const getPreviousCommit = async ({ postId }: Pick<Commit, "postId">) => {
   return prisma.commit.findMany({
-    where: { postSlug },
+    where: { postId },
     orderBy: { updatedAt: "desc" },
     take: 1,
   });
 };
 
 export async function createCommit({
-  postSlug,
+  postId,
   message,
   userId,
   commitId,
@@ -41,7 +39,7 @@ export async function createCommit({
 }: Pick<Commit, "message" | "isTag"> & {
   userId: User["id"];
 } & {
-  postSlug: Post["slug"];
+  postId: Post["id"];
 } & {
   commitId: string;
 }) {
@@ -52,7 +50,7 @@ export async function createCommit({
       isTag,
       post: {
         connect: {
-          slug: postSlug,
+          id: postId,
         },
       },
       user: {
@@ -64,11 +62,11 @@ export async function createCommit({
   });
 }
 
-export const deleteAllCommits = async ({ slug }: { slug: string }) => {
+export const deleteAllCommits = async ({ id }: { id: string }) => {
   await prisma.commit.deleteMany({
     where: {
-      postSlug: {
-        contains: slug,
+      postId: {
+        contains: id,
       },
     },
   });

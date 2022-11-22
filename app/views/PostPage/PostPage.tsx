@@ -70,7 +70,7 @@ const PostPage = ({
 
       <div className="post-bg-wrapper">
         <div className="post-bg-content">
-          <h1 className="my-6 border-b-2 text-center text-3xl">{post.slug}</h1>
+          <h1 className="my-6 border-b-2 text-center text-3xl">{post.id}</h1>
           <div className="commitInfoWrapper">
             <h3 className="h3">{user?.email}</h3>
             <p className="p">{commit?.message}</p>

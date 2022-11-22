@@ -27,9 +27,9 @@ export async function createFile(file: {
   id: string;
   content: any;
   commitId: string;
-  postSlug: string;
+  postId: string;
 }) {
-  const fileKey = `${file.postSlug}/${file.commitId}/${file.name}`;
+  const fileKey = `${file.postId}/${file.commitId}/${file.name}`;
   // AWS connection
   await uploadHandler({
     stream: file.content,
@@ -106,8 +106,8 @@ export async function downloadFileFromS3(fileKey: string) {
   // fileStream.pipe(res);
 }
 
-export const deleteFilesFromS3 = ({ postSlug }: { postSlug: string }) => {
-  const key = `${postSlug}/`;
+export const deleteFilesFromS3 = ({ postId }: { postId: string }) => {
+  const key = `${postId}/`;
 
   return new Promise((resolve, reject) => {
     // get all keys and delete objects

@@ -3,11 +3,10 @@ import type { LinksFunction } from "@remix-run/server-runtime";
 import Button from "~/components/Button";
 import Nav from "~/components/Nav";
 import PostTile from "~/components/PostTile";
-import { deleteFilesFromS3 } from "~/models/file.server";
 import styles from "./PostsPage.css";
 
 type LoaderData = {
-  posts: { title: string; slug: string; creatorUser: User }[];
+  posts: { title: string; id: string; creatorUser: User }[];
 };
 
 export const postsPageLinks: LinksFunction = () => {
@@ -24,10 +23,10 @@ const PostsPage = ({ posts }: LoaderData) => {
         <div className="posts-bg-wrapper">
           {posts?.map((post) => (
             <PostTile
-              key={post.slug}
+              key={post.id}
               title={post.title}
-              slug={post.slug}
-              linkTo={post.slug}
+              id={post.id}
+              linkTo={post.id}
               creatorUser={post.creatorUser.email}
             />
           ))}
