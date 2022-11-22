@@ -32,12 +32,6 @@ const PostsPage = ({ posts }: LoaderData) => {
             />
           ))}
         </div>
-        <button
-          type="button"
-          onClick={() => deleteFilesFromS3({ postSlug: "piste" })}
-        >
-          xd
-        </button>
       </div>
     </main>
   );
