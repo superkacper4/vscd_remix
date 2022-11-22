@@ -42,7 +42,7 @@ export const propertiesPageAction: ActionFunction = async ({
   const postSlug = params.slug;
   invariant(postSlug, "postSlug is required");
 
-  if (confirmDelete) {
+  if (confirmDelete === "delete") {
     await deletePostOnUsers({ slug: postSlug });
     const commitsIds = await getCommitsIds({ postSlug });
     const commitsIdsArray = commitsIds.map((commitId) => commitId.id);
@@ -142,6 +142,7 @@ const PropertiesPage = ({
         {usersOnPosts.map((user) => (
           <p key={user.id}>{user.email}</p>
         ))}
+        <h3>Add parent</h3>
         <Form method="post">
           {inputErrors?.parentIdError ? (
             <em className="text-red-600">{inputErrors?.parentIdError}</em>
@@ -169,12 +170,17 @@ const PropertiesPage = ({
             linkTo={`/posts/${child.slug}`}
           />
         ))}
+        <h3>Delete Post</h3>
         <Form method="post">
           {/* {inputErrors?.parentIdError ? (
             <em className="text-red-600">{inputErrors?.parentIdError}</em>
           ) : null} */}
-          <input type="text" name="confirmDelete" placeholder="Parent Slug" />
-          <button type="submit">Add Parent</button>
+          <input
+            type="text"
+            name="confirmDelete"
+            placeholder='Type "delete" to delete post'
+          />
+          <button type="submit">Confirm</button>
         </Form>
       </div>
     </div>
