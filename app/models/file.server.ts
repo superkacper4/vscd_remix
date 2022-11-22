@@ -107,16 +107,46 @@ export async function downloadFileFromS3(fileKey: string) {
 }
 
 export const deleteFilesFromS3 = ({ postSlug }: { postSlug: string }) => {
-  console.log("create empty object", postSlug);
   const key = `${postSlug}/`;
-  // fix me - doesnt delete files
-  new aws.S3().putObject(
-    {
-      Key: key, // This should create an empty object in which we can store files
-      Bucket: `${AWS_BUCKET_NAME}`,
-    },
-    (err, data) => {
-      console.log(err, data);
-    }
-  );
+
+  return new Promise((resolve, reject) => {
+    // get all keys and delete objects
+    const getAndDelete = (ct: string = null) => {
+      aws.config.update({
+        accessKeyId: AWS_KEY_ID,
+        secretAccessKey: AWS_SECRET_KEY,
+        region: "eu-central-1",
+      });
+      var s3 = new aws.S3();
+      s3.listObjectsV2({
+        Bucket: AWS_BUCKET_NAME,
+        MaxKeys: 1000,
+        ContinuationToken: ct,
+        Prefix: key,
+        Delimiter: "",
+      })
+        .promise()
+        .then(async (data) => {
+          // params for delete operation
+          let params = {
+            Bucket: AWS_BUCKET_NAME,
+            Delete: { Objects: [] },
+          };
+          // add keys to Delete Object
+          data?.Contents.forEach((content) => {
+            params.Delete.Objects.push({ Key: content.Key });
+          });
+          // delete all keys
+          await s3.deleteObjects(params).promise();
+          // check if ct is present
+          if (data.NextContinuationToken)
+            getAndDelete(data.NextContinuationToken);
+          else resolve(true);
+        })
+        .catch((err) => reject(err));
+    };
+
+    // init call
+    getAndDelete();
+  });
 };

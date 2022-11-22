@@ -48,7 +48,7 @@ export const propertiesPageAction: ActionFunction = async ({
     const commitsIdsArray = commitsIds.map((commitId) => commitId.id);
     deleteFilesOnCommits({ commitsIds: commitsIdsArray });
     await deletePost({ slug: postSlug });
-    // deleteFilesFromS3({ postSlug });
+    deleteFilesFromS3({ postSlug });
   } else if (parentId) {
     const user = await requireUserId(request);
 
