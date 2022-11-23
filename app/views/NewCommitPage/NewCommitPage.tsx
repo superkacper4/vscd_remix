@@ -16,6 +16,7 @@ import { requireUserId } from "~/session.server";
 import { v4 as uuidv4 } from "uuid";
 import styles from "./NewCommitPage.css";
 import Nav from "~/components/Nav";
+import { Readable } from "stream";
 
 export const newCommitPageLinks: LinksFunction = () => {
   return [{ rel: "stylesheet", href: styles }];
@@ -54,7 +55,7 @@ export const newCommitPageAction: ActionFunction = async ({
     // handling form post method
     if (filename) {
       // handling file when recived from post method
-      const content = await data.next().then((data) => data.value); //get file STREAM
+      const content = Readable.from(data); //get file STREAM
       const filesForPrisma = {
         // prepare file format for prisma DB
         name: filename,
@@ -68,7 +69,7 @@ export const newCommitPageAction: ActionFunction = async ({
     }
     if (name === "message") {
       //handling message when recived from post method
-      const content = await data.next().then((data) => data.value); //get message value
+      const content = await data.next().then((value) => value.value); //get message value
       const message = String.fromCharCode.apply(null, content); // change 8bit format to string
       return message;
     }
