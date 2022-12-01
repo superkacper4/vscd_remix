@@ -16,9 +16,12 @@ const Button = ({
   fixed?: boolean;
 }) => {
   return (
-    <div className={`button ${fixed ? "button-fixed" : "button-static"}`}>
-      <Link to={url}>{label}</Link>
-    </div>
+    <Link
+      to={url}
+      className={`button ${fixed ? "button-fixed" : "button-static"}`}
+    >
+      {label}
+    </Link>
   );
 };
 
