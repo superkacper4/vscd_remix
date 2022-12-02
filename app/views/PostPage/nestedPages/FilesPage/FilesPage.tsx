@@ -14,6 +14,7 @@ import {
 import { createPostsOnUsers } from "~/models/postsOnUsers.server";
 import { useState } from "react";
 import { Form } from "@remix-run/react";
+import { cutTimeFromDate } from "helpers/helpers";
 
 export const filesPageAction: ActionFunction = async ({ request, params }) => {
   const formData = await request.formData();
@@ -91,12 +92,7 @@ const FilesPage = ({
             >
               <p>{file.name}</p>
               <p className="fileId">{file.id}</p>
-              <p>
-                {String(file.createdAt).slice(
-                  0,
-                  String(file.createdAt).indexOf("T")
-                )}
-              </p>
+              <p>{cutTimeFromDate({ date: file.createdAt })}</p>
             </button>
           </div>
         ))}

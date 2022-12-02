@@ -6,7 +6,7 @@ export type { Post } from "@prisma/client";
 export async function getCommits({ postId }: Pick<Commit, "postId">) {
   return prisma.commit.findMany({
     where: { postId },
-    // select: { message: true, id: true },
+    include: { user: true },
     orderBy: { updatedAt: "desc" },
   });
 }
@@ -19,7 +19,9 @@ export async function getCommitsIds({ postId }: Pick<Commit, "postId">) {
 }
 
 export async function getCommit(id: string) {
-  return prisma.commit.findUnique({ where: { id } });
+  return prisma.commit.findUnique({
+    where: { id },
+  });
 }
 
 export const getPreviousCommit = async ({ postId }: Pick<Commit, "postId">) => {

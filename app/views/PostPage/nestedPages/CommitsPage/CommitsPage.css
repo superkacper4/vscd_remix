@@ -27,11 +27,12 @@
   flex: 1;
 }
 
-.commitsPage-content .commitTile .commitTileMessage {
+.commitsPage-content .commitTile .commitTileMain {
   text-align: center;
+  flex: 2;
 }
 
-.commitsPage-content .commitTile .commitTileId {
+.commitsPage-content .commitTile .commitTileSecondary {
   text-align: center;
   color: var(--secondaryFontColor);
 }

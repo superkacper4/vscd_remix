@@ -2,6 +2,7 @@ import type { Post, PostsOnUsers, User } from "@prisma/client";
 import { Form, Link, useActionData } from "@remix-run/react";
 import type { ActionFunction } from "@remix-run/server-runtime";
 import { json } from "@remix-run/server-runtime";
+import { cutTimeFromDate } from "helpers/helpers";
 import invariant from "tiny-invariant";
 import PostTile from "~/components/PostTile";
 import { deleteAllCommits, getCommitsIds } from "~/models/commit.server";
@@ -124,10 +125,7 @@ const PropertiesPage = ({
         <p>title: {post.title}</p>
         <p>id: {post.id}</p>
 
-        <p>
-          created at:{" "}
-          {String(post.createdAt).slice(0, String(post.createdAt).indexOf("T"))}
-        </p>
+        <p>created at: {cutTimeFromDate({ date: post.createdAt })}</p>
         {post.markdown ? <p>markdown: {post.markdown}</p> : null}
 
         <h3>Add contributor</h3>
