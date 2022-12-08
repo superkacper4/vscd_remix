@@ -66,7 +66,7 @@ const PostPage = ({
   return (
     <main className="post-bg">
       <Nav title={post.title} linkTo="/posts" />
-      <Button url="new" label="+ New Commit" fixed />
+      <Button url="new" label="+ New Commit/Tag" fixed />
 
       <div className="post-bg-wrapper">
         <div className="post-bg-content">

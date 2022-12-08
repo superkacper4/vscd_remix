@@ -19,24 +19,40 @@
   background-color: var(--secondColor);
 }
 
-.commitsPage-content .commitTile a {
+.commitsPage-content .tagTile {
+  background-color: var(--navColor);
+  padding: var(--smallMargin) 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  border-bottom: var(--regularBorderWidth) white solid;
+  transition: background-color 0.2s;
+  margin-bottom: var(--regularMargin);
+  transition: background-color 0.2s;
+}
+
+.commitsPage-content .tagTile:hover {
+  background-color: var(--secondColor);
+}
+
+.commitsPage-content a {
   width: 100%;
 }
 
-.commitsPage-content .commitTile p {
+.commitsPage-content p {
   flex: 1;
 }
 
-.commitsPage-content .commitTile .commitTileMain {
+.commitsPage-content .commitTileMain {
   text-align: center;
   flex: 2;
 }
 
-.commitsPage-content .commitTile .commitTileSecondary {
+.commitsPage-content .commitTileSecondary {
   text-align: center;
   color: var(--secondaryFontColor);
 }
 
-.commitsPage-content .commitTile .commitTileContent {
+.commitsPage-content .commitTileContent {
   display: flex;
 }

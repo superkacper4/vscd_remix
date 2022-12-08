@@ -43,6 +43,7 @@ export const propertiesPageAction: ActionFunction = async ({
   const postId = params.id;
   invariant(postId, "post.id is required");
 
+  // deleting post
   if (confirmDelete === "delete") {
     await deletePostOnUsers({ id: postId });
     const commitsIds = await getCommitsIds({ postId });
@@ -50,7 +51,9 @@ export const propertiesPageAction: ActionFunction = async ({
     deleteFilesOnCommits({ commitsIds: commitsIdsArray });
     await deletePost({ id: postId });
     deleteFilesFromS3({ postId });
-  } else if (parentId) {
+  }
+  // adding parent
+  else if (parentId) {
     const user = await requireUserId(request);
 
     const postsOnUsers = await getPostsOnUsers({ userId: user });
@@ -75,7 +78,9 @@ export const propertiesPageAction: ActionFunction = async ({
     await addParent({ id: postId, parentId });
 
     return "addParent";
-  } else if (userId) {
+  }
+  // adding contributor
+  else if (userId) {
     invariant(userId, "userId is required");
 
     const usersOnPosts = await getUsersOnPost({ postId });

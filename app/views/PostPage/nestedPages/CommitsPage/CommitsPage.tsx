@@ -19,7 +19,10 @@ const CommitsPage = ({ commits }: { commits: CommitType | undefined }) => {
     <div className="commitsPage-content">
       {commits?.map((commit) => {
         return (
-          <div key={commit.id} className="commitTile">
+          <div
+            key={commit.id}
+            className={commit.isTag ? "tagTile" : "commitTile"}
+          >
             <Link to={`?id=${commit.id}`} replace>
               <div className="commitTileContent">
                 <p className="commitTileMain">{commit.message}</p>
