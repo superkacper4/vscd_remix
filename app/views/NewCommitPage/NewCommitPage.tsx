@@ -17,6 +17,7 @@ import { v4 as uuidv4 } from "uuid";
 import styles from "./NewCommitPage.css";
 import Nav from "~/components/Nav";
 import { Readable } from "stream";
+import { mergeFiles } from "helpers/helpers";
 
 export const newCommitPageLinks: LinksFunction = () => {
   return [{ rel: "stylesheet", href: styles }];
@@ -97,31 +98,6 @@ export const newCommitPageAction: ActionFunction = async ({
 
   const generetedPreviousCommitFiles = await generatePreviousCommitFiles();
   const previousCommitFiles = await generetedPreviousCommitFiles(); // using clouseres for previous commit files
-
-  const mergeFiles = (primaryArr, secondaryArr) => {
-    // merging old files with new ones (merge condition -> file name)
-    const concatedArr = primaryArr.concat(secondaryArr);
-
-    const sortedArr = concatedArr.sort(function (a, b) {
-      // sort files from oldest to newest
-      return new Date(a.createdAt) - new Date(b.createdAt);
-    });
-
-    const duplicatFreeObject = sortedArr.reduce(
-      // create an object to replace duplicats
-      (acc, cur) => ({ ...acc, [cur.name]: cur }),
-      {}
-    );
-
-    // crate array from duplicats free object
-    var duplicatFreeArray = Object.keys(duplicatFreeObject).map(
-      (key) => duplicatFreeObject[key]
-    );
-
-    const duplicatFreeFilesIds = duplicatFreeArray.map((file) => file.id);
-
-    return duplicatFreeFilesIds;
-  };
 
   const mergedFilesIds = previousCommitFiles
     ? mergeFiles(files, previousCommitFiles)

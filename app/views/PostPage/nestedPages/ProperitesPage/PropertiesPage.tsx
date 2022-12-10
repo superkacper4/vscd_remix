@@ -1,14 +1,22 @@
-import type { Post, PostsOnUsers, User } from "@prisma/client";
-import { Form, Link, useActionData } from "@remix-run/react";
+import type { Post, User } from "@prisma/client";
+import { Form } from "@remix-run/react";
 import type { ActionFunction } from "@remix-run/server-runtime";
 import { json } from "@remix-run/server-runtime";
-import { cutTimeFromDate } from "helpers/helpers";
+import { cutTimeFromDate, mergeFiles } from "helpers/helpers";
 import invariant from "tiny-invariant";
 import PostTile from "~/components/PostTile";
-import { deleteAllCommits, getCommitsIds } from "~/models/commit.server";
-import { deleteFilesFromS3 } from "~/models/file.server";
-import { deleteFilesOnCommits } from "~/models/filesOnCommits.server";
-import { addParent, deletePost } from "~/models/post.server";
+import {
+  createCommit,
+  getCommitsIds,
+  getPreviousCommit,
+} from "~/models/commit.server";
+import { deleteFilesFromS3, getFiles } from "~/models/file.server";
+import {
+  createFilesOnCommits,
+  deleteFilesOnCommits,
+  getFilesOnCommits,
+} from "~/models/filesOnCommits.server";
+import { addParent, deletePost, getPost } from "~/models/post.server";
 import {
   createPostsOnUsers,
   deletePostOnUsers,
@@ -17,6 +25,7 @@ import {
 } from "~/models/postsOnUsers.server";
 import { getUserByEmail } from "~/models/user.server";
 import { requireUserId } from "~/session.server";
+import { v4 as uuidv4 } from "uuid";
 
 type ActionDataUser =
   | {
@@ -30,6 +39,65 @@ type ActionDataParent =
     }
   | undefined;
 
+const createCommitInParent = async ({
+  postId,
+  parentId,
+  user,
+}: {
+  postId: string;
+  parentId: string;
+  user: string;
+}) => {
+  const commitId = uuidv4();
+  const childrenPreviousCommit = await getPreviousCommit({ postId });
+  const previousParentCommit = await getPreviousCommit({ postId: parentId });
+
+  if (childrenPreviousCommit.length > 0 && previousParentCommit.length > 0) {
+    await createCommit({
+      postId: parentId,
+      message: `commit from ${postId}`,
+      isTag: false,
+      commitId,
+      userId: user,
+    });
+
+    const childrenFilesOnCommits = await getFilesOnCommits({
+      commitId: childrenPreviousCommit[0].id,
+    });
+
+    const parentFilesOnCommits = await getFilesOnCommits({
+      commitId: previousParentCommit[0].id,
+    });
+
+    const childrenFilesOnCommitsArray = childrenFilesOnCommits.map(
+      (file) => file.fileId
+    );
+    const parentFilesOnCommitsArray = parentFilesOnCommits.map(
+      (file) => file.fileId
+    );
+
+    const childrenFiles = await getFiles({
+      id: childrenFilesOnCommitsArray,
+    });
+
+    const parentFiles = await getFiles({
+      id: parentFilesOnCommitsArray,
+    });
+
+    const filesId = mergeFiles(childrenFiles, parentFiles);
+
+    console.log(
+      "filesId: ",
+      filesId,
+      "children files: ",
+      childrenFilesOnCommits,
+      "pareng files: ",
+      parentFilesOnCommits
+    );
+    await createFilesOnCommits({ commitId, filesId });
+  }
+};
+
 export const propertiesPageAction: ActionFunction = async ({
   request,
   params,
@@ -39,6 +107,7 @@ export const propertiesPageAction: ActionFunction = async ({
   const userId = formData.get("userId");
   const parentId = formData.get("parentId");
   const confirmDelete = formData.get("confirmDelete");
+  const uploadParent = formData.get("uploadParent");
 
   const postId = params.id;
   invariant(postId, "post.id is required");
@@ -58,8 +127,6 @@ export const propertiesPageAction: ActionFunction = async ({
 
     const postsOnUsers = await getPostsOnUsers({ userId: user });
 
-    console.log(postsOnUsers, user);
-
     const errors: ActionDataParent = {
       parentId: postsOnUsers.some(
         (postOnUser) => postOnUser?.postId === parentId
@@ -77,7 +144,21 @@ export const propertiesPageAction: ActionFunction = async ({
 
     await addParent({ id: postId, parentId });
 
+    await createCommitInParent({ postId, parentId, user });
+
     return "addParent";
+  }
+  //upload files from repository to parent repository
+  else if (uploadParent) {
+    const user = await requireUserId(request);
+
+    const post = await getPost(postId);
+
+    console.log(post);
+
+    await createCommitInParent({ postId, parentId: post?.parentId, user });
+
+    return "uploadToParent";
   }
   // adding contributor
   else if (userId) {
@@ -86,7 +167,6 @@ export const propertiesPageAction: ActionFunction = async ({
     const usersOnPosts = await getUsersOnPost({ postId });
 
     const user = await getUserByEmail(String(userId));
-    console.log(user);
 
     const generateUserIdError = () => {
       if (usersOnPosts.some((userOnPost) => userOnPost?.userId === user?.id))
@@ -161,6 +241,10 @@ const PropertiesPage = ({
               id={post?.parent.id}
               linkTo={`/posts/${post.parent.id}`}
             />
+            <Form method="post">
+              <input type="hidden" name="uploadParent" value="true" />
+              <button type="submit">upload to parent</button>
+            </Form>
           </>
         ) : null}
 
@@ -175,9 +259,6 @@ const PropertiesPage = ({
         ))}
         <h3>Delete Post</h3>
         <Form method="post">
-          {/* {inputErrors?.parentIdError ? (
-            <em className="text-red-600">{inputErrors?.parentIdError}</em>
-          ) : null} */}
           <input
             type="text"
             name="confirmDelete"
