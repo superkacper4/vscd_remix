@@ -21,10 +21,6 @@
 }
 
 @media (min-width: 650px) {
-  .postTile {
-    width: 60%;
-  }
-
   .postTile:hover {
     background-color: var(--secondColor);
   }

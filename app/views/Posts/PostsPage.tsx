@@ -20,16 +20,18 @@ const PostsPage = ({ posts }: LoaderData) => {
       <div className="posts-bg-content">
         <Button url="new" label="+ New Post" fixed />
         <h1 className="h1">Posts</h1>
-        <div className="posts-bg-wrapper">
-          {posts?.map((post) => (
-            <PostTile
-              key={post.id}
-              title={post.title}
-              id={post.id}
-              linkTo={post.id}
-              creatorUser={post.creatorUser.email}
-            />
-          ))}
+        <div className="flex justify-center">
+          <div className="posts-bg-wrapper">
+            {posts?.map((post) => (
+              <PostTile
+                key={post.id}
+                title={post.title}
+                id={post.id}
+                linkTo={post.id}
+                creatorUser={post.creatorUser.email}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </main>

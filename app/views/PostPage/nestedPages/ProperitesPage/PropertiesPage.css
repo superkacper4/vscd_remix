@@ -1,0 +1,5 @@
+.prop-section {
+  margin: var(--regularMargin) 0;
+  width: 100%;
+  background-color: var(--shadowColor);
+}

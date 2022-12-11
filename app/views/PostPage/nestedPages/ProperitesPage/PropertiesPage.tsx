@@ -1,6 +1,6 @@
 import type { Post, User } from "@prisma/client";
 import { Form } from "@remix-run/react";
-import type { ActionFunction } from "@remix-run/server-runtime";
+import type { ActionFunction, LinksFunction } from "@remix-run/server-runtime";
 import { json } from "@remix-run/server-runtime";
 import { cutTimeFromDate, mergeFiles } from "helpers/helpers";
 import invariant from "tiny-invariant";
@@ -26,6 +26,7 @@ import {
 import { getUserByEmail } from "~/models/user.server";
 import { requireUserId } from "~/session.server";
 import { v4 as uuidv4 } from "uuid";
+import styles from "./PropertiesPage.css";
 
 type ActionDataUser =
   | {
@@ -38,6 +39,10 @@ type ActionDataParent =
       parentId: null | string;
     }
   | undefined;
+
+export const propertiesPageLinks: LinksFunction = () => {
+  return [{ rel: "stylesheet", href: styles }];
+};
 
 const createCommitInParent = async ({
   postId,
@@ -207,65 +212,103 @@ const PropertiesPage = ({
   return (
     <div>
       <div>
-        <p>title: {post.title}</p>
-        <p>id: {post.id}</p>
+        <div className="prop-section">
+          <p>Title: {post.title}</p>
+          <p>Id: {post.id}</p>
 
-        <p>created at: {cutTimeFromDate({ date: post.createdAt })}</p>
-        {post.markdown ? <p>markdown: {post.markdown}</p> : null}
+          <p>Created at: {cutTimeFromDate({ date: post.createdAt })}</p>
+          {post.markdown ? <p>markdown: {post.markdown}</p> : null}
+        </div>
 
-        <h3>Add contributor</h3>
-        <Form method="post">
-          {inputErrors?.userIdError ? (
-            <em className="text-red-600">{inputErrors?.userIdError}</em>
+        <div className="prop-section">
+          <h3>Contributors</h3>
+          <Form method="post">
+            {inputErrors?.userIdError ? (
+              <em className="text-red-600">{inputErrors?.userIdError}</em>
+            ) : null}
+            <input type="text" name="userId" placeholder="email@expample.com" />
+            <p className="text-right">
+              <button
+                type="submit"
+                className="rounded bg-blue-500 py-1 px-2 text-white hover:bg-blue-600 focus:bg-blue-400 disabled:bg-blue-300"
+              >
+                Confirm
+              </button>
+            </p>
+          </Form>
+          <p>Contributors: </p>
+          {usersOnPosts.map((user) => (
+            <p key={user.id}>{user.email}</p>
+          ))}
+        </div>
+
+        <div className="prop-section">
+          <h3>Inheritance</h3>
+          <Form method="post">
+            {inputErrors?.parentIdError ? (
+              <em className="text-red-600">{inputErrors?.parentIdError}</em>
+            ) : null}
+            <input type="text" name="parentId" placeholder="Parent Id" />
+            <p className="text-right">
+              <button
+                type="submit"
+                className="rounded bg-blue-500 py-1 px-2 text-white hover:bg-blue-600 focus:bg-blue-400 disabled:bg-blue-300"
+              >
+                Confirm
+              </button>
+            </p>
+          </Form>
+          {post.parentId ? (
+            <>
+              <p>Parent:</p>
+              <PostTile
+                title={post?.parent.title}
+                id={post?.parent.id}
+                linkTo={`/posts/${post.parent.id}`}
+              />
+              <Form method="post">
+                <input type="hidden" name="uploadParent" value="true" />
+                <p className="text-right">
+                  <button
+                    type="submit"
+                    className="rounded bg-blue-500 py-1 px-2 text-white hover:bg-blue-600 focus:bg-blue-400 disabled:bg-blue-300"
+                  >
+                    Confirm
+                  </button>
+                </p>
+              </Form>
+            </>
           ) : null}
-          <input type="text" name="userId" placeholder="email@expample.com" />
-          <button type="submit">Add user</button>
-        </Form>
-        <p>contributors: </p>
-        {usersOnPosts.map((user) => (
-          <p key={user.id}>{user.email}</p>
-        ))}
-        <h3>Add parent</h3>
-        <Form method="post">
-          {inputErrors?.parentIdError ? (
-            <em className="text-red-600">{inputErrors?.parentIdError}</em>
-          ) : null}
-          <input type="text" name="parentId" placeholder="Parent Id" />
-          <button type="submit">Add Parent</button>
-        </Form>
-        {post.parentId ? (
-          <>
-            <p>parent:</p>
+
+          {post?.children.length > 0 ? <p>Children:</p> : null}
+          {post?.children.map((child) => (
             <PostTile
-              title={post?.parent.title}
-              id={post?.parent.id}
-              linkTo={`/posts/${post.parent.id}`}
+              key={child.id}
+              title={child.title}
+              id={child.id}
+              linkTo={`/posts/${child.id}`}
             />
-            <Form method="post">
-              <input type="hidden" name="uploadParent" value="true" />
-              <button type="submit">upload to parent</button>
-            </Form>
-          </>
-        ) : null}
+          ))}
+        </div>
 
-        {post?.children.length > 0 ? <p>children:</p> : null}
-        {post?.children.map((child) => (
-          <PostTile
-            key={child.id}
-            title={child.title}
-            id={child.id}
-            linkTo={`/posts/${child.id}`}
-          />
-        ))}
-        <h3>Delete Post</h3>
-        <Form method="post">
-          <input
-            type="text"
-            name="confirmDelete"
-            placeholder='Type "delete" to delete post'
-          />
-          <button type="submit">Confirm</button>
-        </Form>
+        <div className="prop-section">
+          <h3>Delete Post</h3>
+          <Form method="post">
+            <input
+              type="text"
+              name="confirmDelete"
+              placeholder='Type "delete" to delete post'
+            />
+            <p className="text-right">
+              <button
+                type="submit"
+                className="rounded bg-blue-500 py-1 px-2 text-white hover:bg-blue-600 focus:bg-blue-400 disabled:bg-blue-300"
+              >
+                Confirm
+              </button>
+            </p>
+          </Form>
+        </div>
       </div>
     </div>
   );

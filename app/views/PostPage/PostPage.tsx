@@ -8,10 +8,15 @@ import FilesPage, { filesPageAction } from "./nestedPages/FilesPage";
 import CommitsPage, { commitsPageLinks } from "./nestedPages/CommitsPage";
 import ProperitesPage, {
   propertiesPageAction,
+  propertiesPageLinks,
 } from "./nestedPages/ProperitesPage";
 
 export const postPageLinks: LinksFunction = () => {
-  return [{ rel: "stylesheet", href: styles }, ...commitsPageLinks()];
+  return [
+    { rel: "stylesheet", href: styles },
+    ...commitsPageLinks(),
+    ...propertiesPageLinks(),
+  ];
 };
 
 const PostPage = ({
