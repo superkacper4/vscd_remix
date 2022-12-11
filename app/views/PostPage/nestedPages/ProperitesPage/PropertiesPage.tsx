@@ -273,7 +273,7 @@ const PropertiesPage = ({
                     type="submit"
                     className="rounded bg-blue-500 py-1 px-2 text-white hover:bg-blue-600 focus:bg-blue-400 disabled:bg-blue-300"
                   >
-                    Confirm
+                    Upload files to parent
                   </button>
                 </p>
               </Form>
