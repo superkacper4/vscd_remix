@@ -55,7 +55,7 @@ const createCommitInParent = async ({
   if (childrenPreviousCommit.length > 0 && previousParentCommit.length > 0) {
     await createCommit({
       postId: parentId,
-      message: `commit from ${postId}`,
+      message: `Download files from: ${postId}`,
       isTag: false,
       commitId,
       userId: user,

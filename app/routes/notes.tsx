@@ -1,10 +1,11 @@
-import type { LoaderArgs } from "@remix-run/node";
+import type { LinksFunction, LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Form, Link, NavLink, Outlet, useLoaderData } from "@remix-run/react";
 
 import { requireUserId } from "~/session.server";
 import { useUser } from "~/utils";
 import { getNoteListItems } from "~/models/note.server";
+import Nav, { navLinks } from "~/components/Nav";
 
 export async function loader({ request }: LoaderArgs) {
   const userId = await requireUserId(request);
@@ -12,30 +13,26 @@ export async function loader({ request }: LoaderArgs) {
   return json({ noteListItems });
 }
 
+export const links: LinksFunction = () => {
+  return [...navLinks()];
+};
+
 export default function NotesPage() {
   const data = useLoaderData<typeof loader>();
-  const user = useUser();
 
   return (
     <div className="flex h-full min-h-screen flex-col">
-      <header className="flex items-center justify-between bg-slate-800 p-4 text-white">
-        <h1 className="text-3xl font-bold">
-          <Link to=".">Notes</Link>
-        </h1>
-        <p>{user.email}</p>
-        <Form action="/logout" method="post">
-          <button
-            type="submit"
-            className="rounded bg-slate-600 py-2 px-4 text-blue-100 hover:bg-blue-500 active:bg-blue-600"
-          >
-            Logout
-          </button>
-        </Form>
-      </header>
+      <Nav title="Notes" linkTo="/" />
 
-      <main className="flex h-full bg-white">
-        <div className="h-full w-80 border-r bg-gray-50">
-          <Link to="new" className="block p-4 text-xl text-blue-500">
+      <main
+        className="flex h-full"
+        style={{
+          backgroundColor: "var(--mainBgDark)",
+          color: "var(--fontColor)",
+        }}
+      >
+        <div className="h-full w-80 border-r">
+          <Link to="new" className="block p-4 text-xl">
             + New Note
           </Link>
 
@@ -49,7 +46,9 @@ export default function NotesPage() {
                 <li key={note.id}>
                   <NavLink
                     className={({ isActive }) =>
-                      `block border-b p-4 text-xl ${isActive ? "bg-white" : ""}`
+                      `block border-b p-4 text-xl ${
+                        isActive ? "bg-slate-600" : ""
+                      }`
                     }
                     to={note.id}
                   >
