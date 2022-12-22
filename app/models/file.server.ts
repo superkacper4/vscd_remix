@@ -4,6 +4,10 @@ import aws from "aws-sdk";
 
 import { S3Client } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
+import type { Post } from "./post.server";
+import { getPostChildren } from "./post.server";
+import type { Commit } from "@prisma/client";
+import { getFilesOnCommits } from "./filesOnCommits.server";
 
 const {
   AWS_BUCKET_NAME,
@@ -15,9 +19,76 @@ const {
   AWS_SECRET_KEY: string;
 } = process.env;
 
-export async function getFiles({ id }: { id: string[] }) {
+const handlePostChildrenData = ({
+  postChildren,
+}: {
+  postChildren: {
+    id: string;
+    children: Post[];
+    commits: Commit[];
+  }[];
+}) => {
+  const children = postChildren?.map((postChild) => postChild?.children);
+  const ids = postChildren?.map((postChild) => postChild?.id);
+  const commits = postChildren?.map((postChild) => postChild?.commits);
+
+  return { children, ids, commits };
+};
+const recursiveGetAllChildren = async ({
+  postIds,
+  oldResult,
+}: {
+  postIds: string[];
+  oldResult: string[];
+}) => {
+  const postChildren = await Promise.all(
+    postIds.map(async (id) => await getPostChildren({ id }))
+  );
+
+  const postChildrenFlated = postChildren?.flat();
+
+  const { children, commits, ids } = handlePostChildrenData({
+    postChildren: postChildrenFlated,
+  });
+  const result = [...commits.flat(), ...oldResult];
+
+  if (postChildrenFlated && postChildrenFlated.length > 0) {
+    return await recursiveGetAllChildren({ postIds: ids, oldResult: result });
+  } else {
+    return result;
+  }
+};
+
+export async function getFiles({
+  id,
+  postId,
+}: {
+  id: string[];
+  postId: string;
+}) {
+  const childrenCommitsIds = await recursiveGetAllChildren({
+    postIds: [postId],
+    oldResult: [],
+  });
+
+  const childrenCommitsIdsArray = childrenCommitsIds.map(
+    (commitId: { id: string }) => commitId.id
+  );
+
+  const filesOnCommits = await Promise.all(
+    childrenCommitsIds.map((commitId: { id: string }) =>
+      getFilesOnCommits({ commitId: commitId?.id })
+    )
+  );
+
+  const filesIds = filesOnCommits
+    .flat()
+    .map((fileOnCommit) => fileOnCommit.fileId);
+
+  console.log(childrenCommitsIdsArray, filesOnCommits, filesIds, id);
+
   return prisma.file.findMany({
-    where: { id: { in: id } },
+    where: { id: { in: [...filesIds, ...id] } },
     // orderBy: { updatedAt: "desc" },
   });
 }

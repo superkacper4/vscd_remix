@@ -5,7 +5,7 @@ import type {
 } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useActionData, useLoaderData } from "@remix-run/react";
-import { getPost } from "~/models/post.server";
+import { getPost, getPostChildren } from "~/models/post.server";
 import invariant from "tiny-invariant";
 
 import type { Post, File, Commit, User, PostsOnUsers } from "@prisma/client";
@@ -66,7 +66,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       commitId: previousCommit[0]?.id,
     });
     const filesIdArray = filesOnCommits.map((file) => file?.fileId);
-    files = await getFiles({ id: filesIdArray });
+    files = await getFiles({ id: filesIdArray, postId });
     user = await getUserById(previousCommit[0].userId);
   }
 
@@ -81,10 +81,12 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     files = await getFiles({ id: filesIdArray });
     user = await getUserById(commit.userId);
   }
+  const children = await getPostChildren({ id: postId });
 
   invariant(post, `Post not found: ${postId}`);
   return json<LoaderData>({
     post,
+    children,
     files,
     previousCommit,
     user,
@@ -109,7 +111,6 @@ export const action: ActionFunction = async ({ request, params }) => {
     request: request.clone(),
     params,
   });
-  console.log(properitesAction);
   if (properitesAction) {
     return properitesAction;
   }
@@ -135,11 +136,12 @@ export default function PostId() {
     commit,
     isNewestCommit,
     usersOnPosts,
+    children,
   } = useLoaderData() as LoaderData;
 
   const actionData = useActionData();
 
-  console.log(actionData);
+  console.log("frontend:", children);
 
   useEffect(() => {
     if (actionData?.url) {

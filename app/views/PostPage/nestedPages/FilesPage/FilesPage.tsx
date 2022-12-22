@@ -24,7 +24,6 @@ export const filesPageAction: ActionFunction = async ({ request, params }) => {
   const userId = formData.get("userId");
 
   if (fileKey) {
-    console.log("filekey", fileKey);
     const url = await downloadFileFromS3(String(fileKey));
 
     return json({ url });

@@ -91,14 +91,6 @@ const createCommitInParent = async ({
 
     const filesId = mergeFiles(childrenFiles, parentFiles);
 
-    console.log(
-      "filesId: ",
-      filesId,
-      "children files: ",
-      childrenFilesOnCommits,
-      "pareng files: ",
-      parentFilesOnCommits
-    );
     await createFilesOnCommits({ commitId, filesId });
   }
 };
@@ -158,8 +150,6 @@ export const propertiesPageAction: ActionFunction = async ({
     const user = await requireUserId(request);
 
     const post = await getPost(postId);
-
-    console.log(post);
 
     await createCommitInParent({ postId, parentId: post?.parentId, user });
 

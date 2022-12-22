@@ -31,6 +31,27 @@ export async function getPost(id: string) {
   });
 }
 
+export const getPostChildren = async ({ id }: { id: string }) => {
+  return prisma.post.findMany({
+    where: { parentId: id },
+
+    select: {
+      id: true,
+      children: true,
+      commits: {
+        select: { id: true },
+        orderBy: { createdAt: "desc" },
+        take: 1,
+      },
+      // children: {
+      //   include: {
+      //     commits: true,
+      //   },
+      // },
+    },
+  });
+};
+
 export async function createPost({
   id,
   title,
