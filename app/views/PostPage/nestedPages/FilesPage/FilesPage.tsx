@@ -1,5 +1,5 @@
 import type { ActionFunction } from "@remix-run/server-runtime";
-import type { File } from "@prisma/client";
+import type { File, Post } from "@prisma/client";
 
 import { json } from "@remix-run/server-runtime";
 import invariant from "tiny-invariant";
@@ -58,9 +58,11 @@ export const filesPageAction: ActionFunction = async ({ request, params }) => {
 const FilesPage = ({
   isNewestCommit,
   files,
+  post,
 }: {
-  files: File[] | undefined;
+  files: (File & { post: Post })[] | undefined;
   isNewestCommit: Boolean;
+  post: Post;
 }) => {
   const [downloadFilePath, setDownloadFilePath] = useState<string>("");
   const [deleteFileId, setDeleteFileId] = useState<string>("");
@@ -72,7 +74,7 @@ const FilesPage = ({
         <input name="fileId" type="hidden" value={deleteFileId} />
         {files?.map((file) => (
           <div key={file.id}>
-            {isNewestCommit ? (
+            {isNewestCommit && file.postId === post.id ? (
               <button
                 type="submit"
                 onClick={() => {
@@ -89,9 +91,11 @@ const FilesPage = ({
                 setDownloadFilePath(file.path);
               }}
             >
-              <p>{file.name}</p>
-              <p className="fileId">{file.id}</p>
-              <p>{cutTimeFromDate({ date: file.createdAt })}</p>
+              <p className="fileName">{file.name}</p>
+              <p className="fileId">{file.post.title}</p>
+              <p className="fileDate">
+                {cutTimeFromDate({ date: file.createdAt })}
+              </p>
             </button>
           </div>
         ))}

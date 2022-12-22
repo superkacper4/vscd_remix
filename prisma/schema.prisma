@@ -49,6 +49,9 @@ model File {
 
   commits   FilesOnCommits[]
   
+  post      Post  @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  postId    String
+  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -90,6 +93,8 @@ model Post {
   children       Post[]  @relation("ParentChildren")
 
   commits        Commit[]
+
+  files          File[]
 
   users          PostsOnUsers[]
   creatorUser    User    @relation(fields: [creatorUserId], references: [id], onDelete: Cascade, onUpdate: Cascade)

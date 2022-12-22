@@ -89,6 +89,7 @@ export async function getFiles({
 
   return prisma.file.findMany({
     where: { id: { in: [...filesIds, ...id] } },
+    include: { post: true },
     // orderBy: { updatedAt: "desc" },
   });
 }
@@ -113,6 +114,7 @@ export async function createFile(file: {
       name: file.name,
       id: file.id,
       path: fileKey,
+      postId: file.postId,
     },
   });
 }

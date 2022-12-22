@@ -65,6 +65,15 @@
   background-color: var(--secondColor);
 }
 
+.fileTile .fileName {
+  flex: 0.6;
+}
+
 .fileTile .fileId {
   color: var(--secondaryFontColor);
+  flex: 0.2;
+}
+
+.fileTile .fileDate {
+  flex: 0.2;
 }

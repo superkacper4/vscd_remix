@@ -64,7 +64,13 @@ const PostPage = ({
         );
 
       default:
-        return <FilesPage isNewestCommit={isNewestCommit} files={files} />;
+        return (
+          <FilesPage
+            isNewestCommit={isNewestCommit}
+            files={files}
+            post={post}
+          />
+        );
     }
   };
 
